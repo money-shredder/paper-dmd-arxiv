@@ -1,0 +1,21 @@
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=0.90\textwidth]{figures/architecture/architecture.pdf}
+    \caption{%
+    \textbf{$D^3$-Cache Framework:}
+    The framework operates through a dynamic adaptive caching mechanism
+that leverages DMD-based prediction to determine
+which timesteps require full computation
+versus cache reuse.
+At timestep $t_k$, the DMD predictor generates $\hat{\mathbf{y}}_{k+1} = \mathbf{A} \mathbf{y}_k$
+based on a linear operator $\mathbf{A}$.
+The preview error compares the prediction with the subsequent exact output,
+and full computation is triggered when the reuse condition is not satisfied
+or the number of reused steps $s_k$ exceeds $S_{\max}$;
+otherwise, the predicted transformer output is reused.
+A sliding window history enables periodic refinement of the operator and threshold,
+allowing adaptation to evolving activation dynamics.
+    }
+    \label{fig:architecture}
+    \vspace{-10pt}
+\end{figure}

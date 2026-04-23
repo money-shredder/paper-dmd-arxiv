@@ -1,0 +1,128 @@
+\begin{figure}[!t]
+  \centering
+  \begingroup
+  \makeatletter
+  \@ifundefined{qualvidimgw}{\newlength{\qualvidimgw}}{}
+  \@ifundefined{qualvidimgh}{\newlength{\qualvidimgh}}{}
+  \@ifundefined{qualvidgridw}{\newlength{\qualvidgridw}}{}
+  \@ifundefined{qualvidrowsep}{\newlength{\qualvidrowsep}}{}
+  \makeatother
+  \setlength{\tabcolsep}{0pt}
+  \renewcommand{\arraystretch}{1.0}
+  \setlength{\fboxsep}{0pt}
+  \setlength{\fboxrule}{0pt}
+  % 1 method-name column + 3 prompt columns.
+  % Each cell contains two adjacent frames/crops (same method, same prompt).
+  \ifdefined\qualvidgap\else\newlength{\qualvidgap}\fi
+  \setlength{\qualvidgap}{0.3pt}
+  \ifdefined\qualvidlabelgap\else\newlength{\qualvidlabelgap}\fi
+  \setlength{\qualvidlabelgap}{0pt}
+  \ifdefined\qualvidlabelw\else\newlength{\qualvidlabelw}\fi
+  \ifdefined\qualvidlabelwtmp\else\newlength{\qualvidlabelwtmp}\fi
+  \settowidth{\qualvidlabelw}{\scriptsize\textbf{Baseline}}
+  \settowidth{\qualvidlabelwtmp}{\scriptsize\textbf{$D^3$-Cache}}
+  \ifdim\qualvidlabelwtmp>\qualvidlabelw\setlength{\qualvidlabelw}{\qualvidlabelwtmp}\fi
+  \settowidth{\qualvidlabelwtmp}{\scriptsize\textbf{TaylorSeer}}
+  \ifdim\qualvidlabelwtmp>\qualvidlabelw\setlength{\qualvidlabelw}{\qualvidlabelwtmp}\fi
+  \settowidth{\qualvidlabelwtmp}{\scriptsize\textbf{MagCache}}
+  \ifdim\qualvidlabelwtmp>\qualvidlabelw\setlength{\qualvidlabelw}{\qualvidlabelwtmp}\fi
+  \settowidth{\qualvidlabelwtmp}{\scriptsize\textbf{TeaCache}}
+  \ifdim\qualvidlabelwtmp>\qualvidlabelw\setlength{\qualvidlabelw}{\qualvidlabelwtmp}\fi
+  \addtolength{\qualvidlabelw}{0.4em}
+  \setlength{\qualvidimgw}{\dimexpr (\textwidth - \qualvidlabelw - \qualvidlabelgap - 2\qualvidgap) / 3\relax}
+  \setlength{\qualvidrowsep}{-5pt}
+  \setlength{\qualvidgridw}{\dimexpr \qualvidlabelw + \qualvidlabelgap + 3\qualvidimgw + 2\qualvidgap\relax}
+  \ifdefined\qualvidsubw\else\newlength{\qualvidsubw}\fi
+  \setlength{\qualvidsubw}{\dimexpr (\qualvidimgw - \qualvidgap) / 2\relax}
+  % Our video frames are landscape; set the cell height close to the true image
+  % height to avoid wasting vertical space (and to fit before page limits).
+  \setlength{\qualvidimgh}{\dimexpr 60\qualvidsubw/100\relax}
+  \newcommand{\qualviddesc}[1]{%
+    \multicolumn{4}{@{}p{\qualvidgridw}@{}}{%
+      \parbox[t][1.8\baselineskip][t]{\qualvidgridw}{\scriptsize #1}%
+    }%
+  }
+  \newcommand{\qualvidcell}[2][]{%
+    \IfFileExists{#2}{%
+      \parbox[b][\qualvidimgh][b]{\qualvidimgw}{%
+        \centering
+        \includegraphics[width=\qualvidimgw,height=\qualvidimgh,keepaspectratio]{#2}%
+      }%
+    }{%
+      \fbox{%
+        \parbox[b][\qualvidimgh][b]{\qualvidimgw}{%
+          \centering
+          \scriptsize #1%
+        }%
+      }%
+    }%
+  }
+  \newcommand{\qualvidmethod}[1]{%
+    \parbox[b][\qualvidimgh][c]{\qualvidlabelw}{%
+      \raggedright\scriptsize\textbf{#1}%
+    }%
+  }
+  \newcommand{\qualvidpair}[3][]{%
+    \IfFileExists{#2}{%
+      \IfFileExists{#3}{%
+        \parbox[b][\qualvidimgh][b]{\qualvidimgw}{%
+          \centering
+          \includegraphics[width=\qualvidsubw,height=\qualvidimgh,keepaspectratio]{#2}%
+          \hspace{\qualvidgap}%
+          \includegraphics[width=\qualvidsubw,height=\qualvidimgh,keepaspectratio]{#3}%
+        }%
+	      }{%
+        \fbox{%
+          \parbox[b][\qualvidimgh][b]{\qualvidimgw}{%
+            \centering
+            \scriptsize #1%
+          }%
+        }%
+      }%
+    }{%
+      \fbox{%
+        \parbox[b][\qualvidimgh][b]{\qualvidimgw}{%
+          \centering
+          \scriptsize #1%
+        }%
+      }%
+    }%
+  }
+  \begin{tabular}{@{}l@{\hspace{\qualvidlabelgap}}c@{\hspace{\qualvidgap}}c@{\hspace{\qualvidgap}}c@{}}
+    & \parbox[t]{\qualvidimgw}{\centering\scriptsize A couple in formal evening wear going home get caught in a heavy downpour with umbrellas, surrealism style.}
+    & \parbox[t]{\qualvidimgw}{\centering\scriptsize A boat sailing leisurely along the Seine River with the Eiffel Tower in background by Hokusai, in the style of Ukiyo.}
+    & \parbox[t]{\qualvidimgw}{\centering\scriptsize A panda drinking coffee in a cafe in Paris, featuring a steady and smooth perspective.} \\[0pt]
+
+    \qualvidmethod{Baseline}
+    & \qualvidpair{figures/qual_video/baseline/504-39-19.png}{figures/qual_video/baseline/1004-39-19.png}
+    & \qualvidpair{figures/qual_video/baseline/2004-33-08.png}{figures/qual_video/baseline/2504-33-08.png}
+    & \qualvidpair{figures/qual_video/baseline/4004-45-50.png}{figures/qual_video/baseline/5904-45-51.png} \\[\qualvidrowsep]
+
+    \qualvidmethod{$D^3$-Cache}
+    & \qualvidpair{figures/qual_video/dmd/504-43-22.png}{figures/qual_video/dmd/1004-43-22.png}
+    & \qualvidpair{figures/qual_video/dmd/2004-25-13.png}{figures/qual_video/dmd/2504-25-13.png}
+    & \qualvidpair{figures/qual_video/dmd/4004-47-39.png}{figures/qual_video/dmd/5904-47-40.png} \\[\qualvidrowsep]
+
+    \qualvidmethod{TaylorSeer}
+    & \qualvidpair{figures/qual_video/taylorseeer/504-40-35.png}{figures/qual_video/taylorseeer/1004-40-35.png}
+    & \qualvidpair{figures/qual_video/taylorseeer/2004-31-32.png}{figures/qual_video/taylorseeer/2504-31-32.png}
+    & \qualvidpair{figures/qual_video/taylorseeer/4005-07-30.png}{figures/qual_video/taylorseeer/5905-07-30.png} \\[\qualvidrowsep]
+
+    \qualvidmethod{MagCache}
+    & \qualvidpair{figures/qual_video/magcache/104-54-19.png}{figures/qual_video/magcache/1004-54-19.png}
+    & \qualvidpair{figures/qual_video/magcache/2004-30-14.png}{figures/qual_video/magcache/2504-30-14.png}
+    & \qualvidpair{figures/qual_video/magcache/4004-49-46.png}{figures/qual_video/magcache/5904-49-46.png} \\[\qualvidrowsep]
+
+    \qualvidmethod{TeaCache}
+    & \qualvidpair{figures/qual_video/teacache/105-09-44.png}{figures/qual_video/teacache/1005-09-44.png}
+    & \qualvidpair{figures/qual_video/teacache/2004-32-12.png}{figures/qual_video/teacache/2504-32-12.png}
+    & \qualvidpair{figures/qual_video/teacache/4005-10-22.png}{figures/qual_video/teacache/5905-10-23.png} \\
+  \end{tabular}
+	  \endgroup
+    \vspace{-10pt}
+    \caption{Qualitative comparisons on text-to-video generation on Wan2.1-t2v-1.3B.
+    Each cell contains two frames/crops from the same video.
+    Best viewed with zoom-in.}
+    \label{fig:qual_video}
+    \vspace{-10pt}
+\end{figure}

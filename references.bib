@@ -1,11 +1,545 @@
-@inproceedings{author19shorthand,
-    author = {Author, A. and Buthor, B. and Cuthor, C.},
-    title = {Title of the paper},
-    booktitle = {Proceedings of the conference},
-    year = {2019},
-    pages = {1--10},
-    publisher = {Publisher},
-    address = {City, Country},
-    month = {Jan.},
-    note = {DOI: 10.0000/0000.0000000000000000}
+@article{ho2020denoising,
+    title={Denoising Diffusion Probabilistic Models},
+    author={Jonathan Ho and Ajay Jain and Pieter Abbeel},
+    year={2020},
+    journal={arXiv preprint arxiv:2006.11239}
+}
+@article{song2020denoising,
+  title={Denoising Diffusion Implicit Models},
+  author={Song, Jiaming and Meng, Chenlin and Ermon, Stefano},
+  journal={arXiv:2010.02502},
+  year={2020},
+  month={October},
+  abbr={Preprint},
+  url={https://arxiv.org/abs/2010.02502}
+}
+
+@misc{dhariwal2021diffusionmodelsbeatgans,
+      title={Diffusion Models Beat GANs on Image Synthesis},
+      author={Prafulla Dhariwal and Alex Nichol},
+      year={2021},
+      eprint={2105.05233},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2105.05233},
+}
+
+
+
+@InProceedings{pmlr-v37-sohl-dickstein15,
+  title = 	 {Deep Unsupervised Learning using Nonequilibrium Thermodynamics},
+  author = 	 {Sohl-Dickstein, Jascha and Weiss, Eric and Maheswaranathan, Niru and Ganguli, Surya},
+  booktitle = 	 {Proceedings of the 32nd International Conference on Machine Learning},
+  pages = 	 {2256--2265},
+  year = 	 {2015},
+  editor = 	 {Bach, Francis and Blei, David},
+  volume = 	 {37},
+  series = 	 {Proceedings of Machine Learning Research},
+  address = 	 {Lille, France},
+  month = 	 {07--09 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v37/sohl-dickstein15.pdf},
+  url = 	 {https://proceedings.mlr.press/v37/sohl-dickstein15.html},
+  abstract = 	 {A central problem in machine learning involves modeling complex data-sets using highly flexible families of probability distributions in which learning, sampling, inference, and evaluation are still analytically or computationally tractable. Here, we develop an approach that simultaneously achieves both flexibility and tractability. The essential idea, inspired by non-equilibrium statistical physics, is to systematically and slowly destroy structure in a data distribution through an iterative forward diffusion process. We then learn a reverse diffusion process that restores structure in data, yielding a highly flexible and tractable generative model of the data. This approach allows us to rapidly learn, sample from, and evaluate probabilities in deep generative models with thousands of layers or time steps, as well as to compute conditional and posterior probabilities under the learned model. We additionally release an open source reference implementation of the algorithm.}
+}
+
+
+@inproceedings{song2019generative,
+  title={Generative Modeling by Estimating Gradients of the Data Distribution},
+  author={Song, Yang and Ermon, Stefano},
+  booktitle={Advances in Neural Information Processing Systems},
+  pages={11895--11907},
+  year={2019}
+}
+
+
+@misc{rombach2021highresolution,
+      title={High-Resolution Image Synthesis with Latent Diffusion Models},
+      author={Robin Rombach and Andreas Blattmann and Dominik Lorenz and Patrick Esser and Björn Ommer},
+      year={2021},
+      eprint={2112.10752},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+
+% quantization
+
+
+
+@misc{zhao2025realtimevideogenerationpyramid,
+      title={Real-Time Video Generation with Pyramid Attention Broadcast},
+      author={Xuanlei Zhao and Xiaolong Jin and Kai Wang and Yang You},
+      year={2025},
+      eprint={2408.12588},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2408.12588},
+}
+
+@misc{chen2024deltadittrainingfreeaccelerationmethod,
+      title={$\Delta$-DiT: A Training-Free Acceleration Method Tailored for Diffusion Transformers},
+      author={Pengtao Chen and Mingzhu Shen and Peng Ye and Jianjian Cao and Chongjun Tu and Christos-Savvas Bouganis and Yiren Zhao and Tao Chen},
+      year={2024},
+      eprint={2406.01125},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2406.01125},
+}
+
+
+
+
+@article{TaylorSeer2025,
+  title={From Reusing to Forecasting: Accelerating Diffusion Models with TaylorSeers},
+  author={Liu, Jiacheng and Zou, Chang and Lyu, Yuanhuiyi and Chen, Junjie and Zhang, Linfeng},
+  journal={arXiv preprint arXiv:2503.06923},
+  year={2025}
+}
+
+@misc{feng2025hicachetrainingfreeaccelerationdiffusion,
+      title={HiCache: Training-free Acceleration of Diffusion Models via Hermite Polynomial-based Feature Caching},
+      author={Liang Feng and Shikang Zheng and Jiacheng Liu and Yuqi Lin and Qinming Zhou and Peiliang Cai and Xinyu Wang and Junjie Chen and Chang Zou and Yue Ma and Linfeng Zhang},
+      year={2025},
+      eprint={2508.16984},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2508.16984},
+}
+
+
+@article{liu2024timestep,
+  title={Timestep Embedding Tells: It's Time to Cache for Video Diffusion Model},
+  author={Liu, Feng and Zhang, Shiwei and Wang, Xiaofeng and Wei, Yujie and Qiu, Haonan and Zhao, Yuzhong and Zhang, Yingya and Ye, Qixiang and Wan, Fang},
+  journal={arXiv preprint arXiv:2411.19108},
+  year={2024}
+}
+
+@inproceedings{ma2025magcache,
+  title={MagCache: Fast Video Generation with Magnitude-Aware Cache},
+  author={Zehong Ma and Longhui Wei and Feng Wang and Shiliang Zhang and Qi Tian},
+  booktitle={The Thirty-ninth Annual Conference on Neural Information Processing Systems},
+  year={2025},
+  url={https://openreview.net/forum?id=KZn7TDOL4J}
+}
+
+
+@article{adacache,
+    title={Adaptive Caching for Faster Video Generation with Diffusion Transformers},
+    author={Kumara Kahatapitiya, Haozhe Liu, Sen He, Ding Liu, Menglin Jia, Chenyang Zhang, Michael S. Ryoo, and Tian Xie},
+    journal={arXiv preprint arXiv:2411.02397},
+    year={2024}
+}
+
+@inproceedings{Xu_2018, series={MobiCom '18},
+   title={DeepCache: Principled Cache for Mobile Deep Vision},
+   url={http://dx.doi.org/10.1145/3241539.3241563},
+   DOI={10.1145/3241539.3241563},
+   booktitle={Proceedings of the 24th Annual International Conference on Mobile Computing and Networking},
+   publisher={ACM},
+   author={Xu, Mengwei and Zhu, Mengze and Liu, Yunxin and Lin, Felix Xiaozhu and Liu, Xuanzhe},
+   year={2018},
+   month=oct, pages={129--144},
+   collection={MobiCom '18} }
+
+@inproceedings{lv2024fastercache,
+  title={FasterCache: Training-Free Video Diffusion Model Acceleration with High Quality},
+  author={Lv, Zhengyao and Si, Chenyang and Song, Junhao and Yang, Zhenyu and Qiao, Yu and Liu, Ziwei and Kwan-Yee K. Wong},
+  booktitle={arxiv},
+  year={2024}
+}
+
+% quantization
+@misc{chen2024QDiT,
+      title={Q-DiT: Accurate Post-Training Quantization for Diffusion Transformers},
+      author={Lei Chen and Yuan Meng and Chen Tang and Xinzhu Ma and Jingyan Jiang and Xin Wang and Zhi Wang and Wenwu Zhu},
+      year={2024},
+      eprint={2406.17343},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2406.17343},
+}
+
+
+@misc{zhao2024viditq,
+      title={ViDiT-Q: Efficient and Accurate Quantization of Diffusion Transformers for Image and Video Generation},
+      author={Tianchen Zhao and Tongcheng Fang and Enshu Liu and Wan Rui and Widyadewi Soedarmadji and Shiyao Li and Zinan Lin and Guohao Dai and Shengen Yan and Huazhong Yang and Xuefei Ning and Yu Wang},
+      year={2024},
+      eprint={2406.02540},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@article{feng2025q,
+  title={Q-VDiT: Towards Accurate Quantization and Distillation of Video-Generation Diffusion Transformers},
+  author={Feng, Weilun and Yang, Chuanguang and Qin, Haotong and Li, Xiangqi and Wang, Yu and An, Zhulin and Huang, Libo and Diao, Boyu and Zhao, Zixiang and Xu, Yongjun and others},
+  journal={arXiv preprint arXiv:2505.22167},
+  year={2025}
+}
+
+
+@misc{he2023ptqdaccurateposttrainingquantization,
+      title={PTQD: Accurate Post-Training Quantization for Diffusion Models},
+      author={Yefei He and Luping Liu and Jing Liu and Weijia Wu and Hong Zhou and Bohan Zhuang},
+      year={2023},
+      eprint={2305.10657},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2305.10657},
+}
+
+@inproceedings{shang2023ptqdm,
+title={Post-training Quantization on Diffusion Models},
+author={Yuzhang Shang and Zhihang Yuan and Bin Xie and Bingzhe Wu and Yan Yan},
+booktitle={CVPR},
+year={2023}
+}
+
+@misc{so2023temporaldynamicquantizationdiffusion,
+      title={Temporal Dynamic Quantization for Diffusion Models},
+      author={Junhyuk So and Jungwon Lee and Daehyun Ahn and Hyungjun Kim and Eunhyeok Park},
+      year={2023},
+      eprint={2306.02316},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2306.02316},
+}
+
+@inproceedings{li2024svdquant,
+  title={SVDQuant: Absorbing Outliers by Low-Rank Components for 4-Bit Diffusion Models},
+  author={Li*, Muyang and Lin*, Yujun and Zhang*, Zhekai and Cai, Tianle and Li, Xiuyu and Guo, Junxian and Xie, Enze and Meng, Chenlin and Zhu, Jun-Yan and Han, Song},
+  booktitle={The Thirteenth International Conference on Learning Representations},
+  year={2025}
+}
+
+
+@inproceedings{wu2024ptq4dit,
+  title={PTQ4DiT: Post-training Quantization for Diffusion Transformers},
+  author={Wu, Junyi and Wang, Haoxuan and Shang, Yuzhang and Shah, Mubarak and Yan, Yan},
+  booktitle={NeurIPS},
+  year={2024}
+}
+
+
+% architectures
+@misc{vaswani2023attentionneed,
+      title={Attention Is All You Need},
+      author={Ashish Vaswani and Noam Shazeer and Niki Parmar and Jakob Uszkoreit and Llion Jones and Aidan N. Gomez and Lukasz Kaiser and Illia Polosukhin},
+      year={2023},
+      eprint={1706.03762},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/1706.03762},
+}
+% Unet
+@misc{ronneberger2015unetconvolutionalnetworksbiomedical,
+      title={U-Net: Convolutional Networks for Biomedical Image Segmentation},
+      author={Olaf Ronneberger and Philipp Fischer and Thomas Brox},
+      year={2015},
+      eprint={1505.04597},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/1505.04597},
+}
+
+% DIT
+@article{Peebles2022DiT,
+  title={Scalable Diffusion Models with Transformers},
+  author={William Peebles and Saining Xie},
+  year={2022},
+  journal={arXiv preprint arXiv:2212.09748},
+}
+@inproceedings{bao2022all,
+  title={All are Worth Words: A ViT Backbone for Diffusion Models},
+  author={Bao, Fan and Nie, Shen and Xue, Kaiwen and Cao, Yue and Li, Chongxuan and Su, Hang and Zhu, Jun},
+  booktitle = {CVPR},
+  year={2023}
+}
+
+
+
+@inproceedings{Karras2022edm,
+  author    = {Tero Karras and Miika Aittala and Timo Aila and Samuli Laine},
+  title     = {Elucidating the Design Space of Diffusion-Based Generative Models},
+  booktitle = {Proc. NeurIPS},
+  year      = {2022}
+}
+
+@article{Lu_2025,
+   title={DPM-Solver++: Fast Solver for Guided Sampling of Diffusion Probabilistic Models},
+   volume={22},
+   ISSN={2731-5398},
+   url={http://dx.doi.org/10.1007/s11633-025-1562-4},
+   DOI={10.1007/s11633-025-1562-4},
+   number={4},
+   journal={Machine Intelligence Research},
+   publisher={Springer Science and Business Media LLC},
+   author={Lu, Cheng and Zhou, Yuhao and Bao, Fan and Chen, Jianfei and Li, Chongxuan and Zhu, Jun},
+   year={2025},
+   month=jun, pages={730--751} }
+
+
+@article{li2024faster,
+  title={Faster diffusion: Rethinking the role of the encoder for diffusion model inference},
+  author={Li, Senmao and Hu, Taihang and van de Weijer, Joost and Shahbaz Khan, Fahad and Liu, Tao and Li, Linxuan and Yang, Shiqi and Wang, Yaxing and Cheng, Ming-Ming and others},
+  journal={Advances in Neural Information Processing Systems},
+  volume={37},
+  pages={85203--85240},
+  year={2024}
+}
+
+
+@misc{salimans2022progressivedistillationfastsampling,
+      title={Progressive Distillation for Fast Sampling of Diffusion Models},
+      author={Tim Salimans and Jonathan Ho},
+      year={2022},
+      eprint={2202.00512},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2202.00512},
+}
+
+@misc{meng2023distillationguideddiffusionmodels,
+      title={On Distillation of Guided Diffusion Models},
+      author={Chenlin Meng and Robin Rombach and Ruiqi Gao and Diederik P. Kingma and Stefano Ermon and Jonathan Ho and Tim Salimans},
+      year={2023},
+      eprint={2210.03142},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2210.03142},
+}
+
+
+@misc{song2023consistencymodels,
+      title={Consistency Models},
+      author={Yang Song and Prafulla Dhariwal and Mark Chen and Ilya Sutskever},
+      year={2023},
+      eprint={2303.01469},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2303.01469},
+}
+
+@misc{luo2023latent,
+      title={Latent Consistency Models: Synthesizing High-Resolution Images with Few-Step Inference},
+      author={Simian Luo and Yiqin Tan and Longbo Huang and Jian Li and Hang Zhao},
+      year={2023},
+      eprint={2310.04378},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@article{so2023frdiff,
+         title={FRDiff: Feature Reuse for Exquisite Zero-shot Acceleration of Diffusion Models},
+         author={So, Junhyuk and Lee, Jungwon and Park, Eunhyeok},
+         journal={arXiv preprint arXiv:2312.03517},
+         year={2023}
+}
+
+@misc{zou2025rethinkingtokenwisefeaturecaching,
+      title={Rethinking Token-wise Feature Caching: Accelerating Diffusion Transformers with Dual Feature Caching},
+      author={Chang Zou and Evelyn Zhang and Runlin Guo and Haohang Xu and Conghui He and Xuming Hu and Linfeng Zhang},
+      year={2025},
+      eprint={2412.18911},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2412.18911},
+}
+@misc{yu2025abcachetrainingfreeaccelerationdiffusion,
+      title={AB-Cache: Training-Free Acceleration of Diffusion Models via Adams-Bashforth Cached Feature Reuse},
+      author={Zichao Yu and Zhen Zou and Guojiang Shao and Chengwei Zhang and Shengze Xu and Jie Huang and Feng Zhao and Xiaodong Cun and Wenyi Zhang},
+      year={2025},
+      eprint={2504.10540},
+      archivePrefix={arXiv},
+      primaryClass={stat.ML},
+      url={https://arxiv.org/abs/2504.10540},
+}
+
+@article{zou2024accelerating,
+  title={Accelerating Diffusion Transformers with Token-wise Feature Caching},
+  author={Zou, Chang and Liu, Xuyang and Liu, Ting and Huang, Siteng and Zhang, Linfeng},
+  journal={arXiv preprint arXiv:2410.05317},
+  year={2024}
+}
+
+@misc{selvaraju2024forafastforwardcachingdiffusion,
+      title={FORA: Fast-Forward Caching in Diffusion Transformer Acceleration},
+      author={Pratheba Selvaraju and Tianyu Ding and Tianyi Chen and Ilya Zharkov and Luming Liang},
+      year={2024},
+      eprint={2407.01425},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2407.01425},
+}
+
+
+% models
+% latte
+@article{ma2025latte,
+  title={Latte: Latent Diffusion Transformer for Video Generation},
+  author={Ma, Xin and Wang, Yaohui and Chen, Xinyuan and Jia, Gengyun and Liu, Ziwei and Li, Yuan-Fang and Chen, Cunjian and Qiao, Yu},
+  journal={Transactions on Machine Learning Research},
+  year={2025}
+}
+
+% SORA
+@misc{videoworldsimulators2024,
+  title={Video generation models as world simulators},
+  author={Tim Brooks and Bill Peebles and Connor Holmes and Will DePue and Yufei Guo and Li Jing and David Schnurr and Joe Taylor and Troy Luhman and Eric Luhman and Clarence Ng and Ricky Wang and Aditya Ramesh},
+  year={2024},
+  url={https://openai.com/research/video-generation-models-as-world-simulators},
+}
+
+% pixart-alpha
+@misc{chen2023pixartalpha,
+      title={PixArt-$\alpha$: Fast Training of Diffusion Transformer for Photorealistic Text-to-Image Synthesis},
+      author={Junsong Chen and Jincheng Yu and Chongjian Ge and Lewei Yao and Enze Xie and Yue Wu and Zhongdao Wang and James Kwok and Ping Luo and Huchuan Lu and Zhenguo Li},
+      year={2023},
+      eprint={2310.00426},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+% sdxl
+@misc{podell2023sdxlimprovinglatentdiffusion,
+      title={SDXL: Improving Latent Diffusion Models for High-Resolution Image Synthesis},
+      author={Dustin Podell and Zion English and Kyle Lacey and Andreas Blattmann and Tim Dockhorn and Jonas Müller and Joe Penna and Robin Rombach},
+      year={2023},
+      eprint={2307.01952},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2307.01952},
+}
+
+@misc{flux2024,
+    author={Black Forest Labs},
+    title={FLUX},
+    year={2024},
+    howpublished={\url{https://github.com/black-forest-labs/flux}},
+}
+
+
+@article{hidreami1technicalreport,
+  title={HiDream-I1: A High-Efficient Image Generative Foundation Model with Sparse Diffusion Transformer},
+  author={Cai, Qi and Chen, Jingwen and Chen, Yang and Li, Yehao and Long, Fuchen and Pan, Yingwei and Qiu, Zhaofan and Zhang, Yiheng and Gao, Fengbin and Xu, Peihan and others},
+  journal={arXiv preprint arXiv:2505.22705},
+  year={2025}
+}
+
+@article{kong2024hunyuanvideo,
+  title={Hunyuanvideo: A systematic framework for large video generative models},
+  author={Kong, Weijie and Tian, Qi and Zhang, Zijian and Min, Rox and Dai, Zuozhuo and Zhou, Jin and Xiong, Jiangfeng and Li, Xin and Wu, Bo and Zhang, Jianwei and others},
+  journal={arXiv preprint arXiv:2412.03603},
+  year={2024}
+}
+
+
+
+@article{wan2025,
+      title={Wan: Open and Advanced Large-Scale Video Generative Models},
+      author={Team Wan and Ang Wang and Baole Ai and Bin Wen and Chaojie Mao and Chen-Wei Xie and Di Chen and Feiwu Yu and Haiming Zhao and Jianxiao Yang and Jianyuan Zeng and Jiayu Wang and Jingfeng Zhang and Jingren Zhou and Jinkai Wang and Jixuan Chen and Kai Zhu and Kang Zhao and Keyu Yan and Lianghua Huang and Mengyang Feng and Ningyi Zhang and Pandeng Li and Pingyu Wu and Ruihang Chu and Ruili Feng and Shiwei Zhang and Siyang Sun and Tao Fang and Tianxing Wang and Tianyi Gui and Tingyu Weng and Tong Shen and Wei Lin and Wei Wang and Wei Wang and Wenmeng Zhou and Wente Wang and Wenting Shen and Wenyuan Yu and Xianzhong Shi and Xiaoming Huang and Xin Xu and Yan Kou and Yangyu Lv and Yifei Li and Yijing Liu and Yiming Wang and Yingya Zhang and Yitong Huang and Yong Li and You Wu and Yu Liu and Yulin Pan and Yun Zheng and Yuntao Hong and Yupeng Shi and Yutong Feng and Zeyinzi Jiang and Zhen Han and Zhi-Fan Wu and Ziyu Liu},
+      journal = {arXiv preprint arXiv:2503.20314},
+      year={2025}
+}
+
+@misc{wu2025qwenimagetechnicalreport,
+      title={Qwen-Image Technical Report},
+      author={Chenfei Wu and Jiahao Li and Jingren Zhou and Junyang Lin and Kaiyuan Gao and Kun Yan and Sheng-ming Yin and Shuai Bai and Xiao Xu and Yilei Chen and Yuxiang Chen and Zecheng Tang and Zekai Zhang and Zhengyi Wang and An Yang and Bowen Yu and Chen Cheng and Dayiheng Liu and Deqing Li and Hang Zhang and Hao Meng and Hu Wei and Jingyuan Ni and Kai Chen and Kuan Cao and Liang Peng and Lin Qu and Minggang Wu and Peng Wang and Shuting Yu and Tingkun Wen and Wensen Feng and Xiaoxiao Xu and Yi Wang and Yichang Zhang and Yongqiang Zhu and Yujia Wu and Yuxuan Cai and Zenan Liu},
+      year={2025},
+      eprint={2508.02324},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2508.02324},
+}
+
+
+@misc{zhang2025framecontextpackingdrift,
+      title={Frame Context Packing and Drift Prevention in Next-Frame-Prediction Video Diffusion Models},
+      author={Lvmin Zhang and Shengqu Cai and Muyang Li and Gordon Wetzstein and Maneesh Agrawala},
+      year={2025},
+      eprint={2504.12626},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2504.12626},
+}
+
+
+@article{ren2024consisti2v,
+  title={ConsistI2V: Enhancing Visual Consistency for Image-to-Video Generation},
+  author={Ren, Weiming and Yang, Harry and Zhang, Ge and Wei, Cong and Du, Xinrun and Huang, Stephen and Chen, Wenhu},
+  journal={arXiv preprint arXiv:2402.04324},
+  year={2024}
+}
+
+% caching
+@misc{wimbauer2024cachecanacceleratingdiffusion,
+      title={Cache Me if You Can: Accelerating Diffusion Models through Block Caching},
+      author={Felix Wimbauer and Bichen Wu and Edgar Schoenfeld and Xiaoliang Dai and Ji Hou and Zijian He and Artsiom Sanakoyeu and Peizhao Zhang and Sam Tsai and Jonas Kohler and Christian Rupprecht and Daniel Cremers and Peter Vajda and Jialiang Wang},
+      year={2024},
+      eprint={2312.03209},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2312.03209},
+}
+
+@article{tgate,
+  title={Cross-Attention Makes Inference Cumbersome in Text-to-Image Diffusion Models},
+  author={Zhang, Wentian and Liu, Haozhe and Xie, Jinheng and Faccio, Francesco and Shou, Mike Zheng and Schmidhuber, J{\"u}rgen},
+  journal={arXiv preprint arXiv:2404.02747v1},
+  year={2024}
+}
+
+@misc{dey2022dynamicmodedecompositionkoopman,
+      title={Dynamic Mode Decomposition and Koopman Theory},
+      author={Sourya Dey},
+      year={2022},
+      eprint={2211.07561},
+      archivePrefix={arXiv},
+      primaryClass={math.OC},
+      url={https://arxiv.org/abs/2211.07561},
+}
+
+@book{kutz2016dynamic,
+  title={Dynamic Mode Decomposition: Data-Driven Modeling of Complex Systems},
+  author={Kutz, J.N. and Brunton, S.L. and Brunton, B.W. and Proctor, J.L.},
+  isbn={9781611974492},
+  lccn={2016024120},
+  series={Other Titles in Applied Mathematics },
+  url={https://books.google.co.jp/books?id=kL_zDQAAQBAJ},
+  year={2016},
+  publisher={Society for Industrial and Applied Mathematics}
+}
+
+
+
+@misc{shih2023paradigms,
+    title = {Parallel Sampling of Diffusion Models},
+    author={Shih, Andy and Belkhale, Suneel and Ermon, Stefano and Sadigh, Dorsa and Anari, Nima},
+    publisher = {arXiv},
+    year = {2023},
+}
+
+% vbench
+ @InProceedings{huang2023vbench,
+     title={{VBench}: Comprehensive Benchmark Suite for Video Generative Models},
+     author={Huang, Ziqi and He, Yinan and Yu, Jiashuo and Zhang, Fan and Si, Chenyang and Jiang, Yuming and Zhang, Yuanhan and Wu, Tianxing and Jin, Qingyang and Chanpaisit, Nattapol and Wang, Yaohui and Chen, Xinyuan and Wang, Limin and Lin, Dahua and Qiao, Yu and Liu, Ziwei},
+     booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+     year={2024}
+ }
+
+% drawbench200
+@article{saharia2022photorealistic,
+  title={Photorealistic text-to-image diffusion models with deep language understanding},
+  author={Saharia, Chitwan and Chan, William and Saxena, Saurabh and Li, Lala and Whang, Jay and Denton, Emily L and Ghasemipour, Kamyar and Gontijo Lopes, Raphael and Karagol Ayan, Burcu and Salimans, Tim and others},
+  journal={Advances in Neural Information Processing Systems},
+  volume={35},
+  pages={36479--36494},
+  year={2022}
+}
+
+% flash-attention
+@inproceedings{dao2023flashattention2,
+  title={Flash{A}ttention-2: Faster Attention with Better Parallelism and Work Partitioning},
+  author={Dao, Tri},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2024}
 }

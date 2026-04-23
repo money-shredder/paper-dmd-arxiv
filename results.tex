@@ -1,109 +1,311 @@
+% !TEX root = paper.tex
 \section{Experimental Results}\label{sec:results}
 
-\subsection{Section Organization}\label{sec:results:organization}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[t]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth, trim=0 0 20pt 0]{figures/results/FID.pdf}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth, trim=10pt 0 10pt 0]{figures/results/LPIPS.pdf}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth, trim=10pt 0 10pt 0]{figures/results/SSIM.pdf}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth, trim=10pt 0 0pt 0]{figures/results/PSNR.pdf}
+    \end{subfigure}\hfill
+    \caption{
+        Quality metrics (FID, LPIPS, PSNR, SSIM) across methods on FLUX.1-dev model.
+    }\label{fig:results:metrics}
+    \vspace{-10pt}
+\end{figure}
 
-This section should discuss
-the experimental setup and results
-in your experiments.
-More often than not,
-it should include the following subsections.
+\input{tables/flux_main}
 
 \subsection{Experimental Setup}\label{sec:results:setup}
 
-This subsection should discuss:
-\begin{itemize}
-    \item Datasets
-    \item Metrics
-    \item Hyperparameters
-    \item Baselines
-    \item Model Architectures
-\end{itemize}
+\textbf{Model Configurations and Compared Methods.}
+We evaluate $D^3$-Cache
+on both text-to-image
+and text-to-video generative models.
+For text-to-image synthesis,
+we employ FLUX.1-dev~\cite{flux2024}
+and HiDream-I1-full~\cite{hidreami1technicalreport}.
+For text-to-video generation,
+we utilize Wan2.1~\cite{wan2025}
+and HunyuanVideo~\cite{kong2024hunyuanvideo}.
+We systematically compare $D^3$-Cache
+against state-of-the-art cache-based acceleration methods:
+TeaCache~\cite{liu2024timestep},
+MagCache~\cite{ma2025magcache},
+and TaylorSeer~\cite{TaylorSeer2025}.
 
-\subsection{Main Results}\label{sec:results:main}
+\textbf{FLUX.1-dev.}~\cite{flux2024}
+All experiments are conducted at $1024\times1024$ resolution
+under strictly controlled conditions to ensure reproducibility.
+The random seed is fixed to 42,
+inference employs 50 diffusion timesteps,
+and the classifier-free guidance scale is set to 3.5.
+Latency and performance metrics are measured on a single H800 GPU
+to maintain experimental consistency.
 
-This subsection should discuss:
-\begin{itemize}
-    \item Comparison with baselines
-    \begin{itemize}
-        \item Qualitative / visual results
-        \item Quantitative results
-    \end{itemize}
-    \item Analysis and discussion
-\end{itemize}
+\textbf{HiDream-I1-full.}~\cite{hidreami1technicalreport}
+All experiments are performed at $1024\times1024$ resolution
+with the random seed fixed to 42 and classifier-free guidance scale set to 5.0.
+All methods are evaluated on a single H800 GPU
+under identical hardware conditions.
 
-For tabular results,
-follow the example below,
-rendered as \Cref{tab:example}.
+\textbf{Wan2.1.}~\cite{wan2025}
+All experiments use the Wan2.1-t2v-1.3B model
+at $832\times480$ resolution with 65 frames per sample
+and 50 diffusion timesteps.
+All methods are evaluated on a single H800 GPU.
 
-For plots,
-include the plot ``.py'' files
-in \verb|figures/| directory,
-you can use \verb|figures/plot_example.py| as a template,
-which is rendered as \Cref{fig:plot:matplotlib}.
-Alternatively,
-you may include the plot data
-in a CSV file located in \verb|data/| directory,
-and plot the results using TikZ + PGFPlots.
-For instance,
-\Cref{fig:plot:tikz} is rendered
-from \verb|figures/data/plot_example.csv|.
-\input{tables/example}
-\begin{figure}[ht]
-    \centering
-    \hpad
-    \begin{subfigure}{0.45\linewidth}
-        \centering
-        \includegraphics[width=\linewidth]{plot_example}
-        \caption{%
-            An example plot using Matplotlib.
-        }\label{fig:plot:matplotlib}
-    \end{subfigure}
-    \hpad
-    \begin{subfigure}{0.45\textwidth}
-        \centering
-        \tikzsnfn{plot_example_tikz}
-        \begin{tikzpicture}
-            \begin{axis}[
-                cycle list/Dark2,
-                width=\textwidth,
-                height=0.8\textwidth,
-                xlabel={\( x \)},
-                ylabel={\( \sin\parens{x} \)},
-                xtick={0, 1, ..., 6},
-                ytick={-1, -0.5, ..., 1},
-                xmin=0,
-                xmax=6.28318530718,
-                legend pos=north west,
-                grid=both,
-            ]
-            \addplot +[
-                line width=1.5pt, solid,
-            ] table[
-                x=time, y=amplitude, col sep=comma,
-            ]{data/plot_example.csv};
-            \end{axis}
-        \end{tikzpicture}
-        \caption{%
-            An example plot using TikZ + PGFPlots.
-        }\label{fig:plot:tikz}
-    \end{subfigure}
-    \hpad
-    \caption{%
-        Example plots.
-    }\label{fig:plot}
-\end{figure}
+\textbf{HunyuanVideo.}~\cite{kong2024hunyuanvideo}
+All experiments are performed at $832\times624$ resolution
+with embedded CFG scale 6.0 and 129 frames per video.
+Inference employs 50 diffusion timesteps
+and is evaluated on four H20 GPUs with 96 GB memory each.
 
-\subsection{Additional Results}\label{sec:results:additional}
+\textbf{Evaluation and Metrics.}
+To comprehensively assess image and video synthesis acceleration methods,
+we assess performance
+along two complementary dimensions.
+Computational efficiency is characterized
+end-to-end inference latency.
+Visual quality is evaluated
+via two complementary metric classes:
+(i) reference-based metrics LPIPS, PSNR, and SSIM
+for fine-grained reconstruction and structural fidelity assessment;
+and (ii) distribution-level metric FID
+for evaluating generation quality in the feature space.
+Our evaluation design adheres to the benchmarking protocols
+established in TeaCache~\cite{liu2024timestep}.
+For text-to-video synthesis, we further evaluate generation quality
+using VBench~\cite{huang2023vbench} to provide a comprehensive assessment.
+Following prior work~\cite{ren2024consisti2v},
+we report results on eight major evaluation dimensions defined in VBench.
 
-This subsection should discuss
-additional relevant results
-that are not included
-in \Cref{sec:results:main}.
+\textbf{Implementation Details.}
+We adopt FlashAttention~\cite{dao2023flashattention2}
+as the default attention mechanism
+across all experiments.
+Latency is measured on a single H800 GPU
+to ensure consistent evaluation conditions.
+As for text-to-image generation,
+we conduct evaluation
+on DrawBench~\cite{saharia2022photorealistic} with 200 text descriptions,
+providing diverse, real-world text inputs
+for assessing text-to-image generation quality.
+All generated images
+are at a resolution of \(1024 \times 1024\).
+To enable fair comparison on all the models,
+we carefully align the hyperparameters
+across acceleration methods.
+Systematic hyperparameter tuning is performed for each method:
+TeaCache relevance threshold $r$ is explored
+across [0.2, 0.8],
+TaylorSeer interval $\mathcal{N}$ spans [3, 9] with order $\mathcal{O}$ of 1,
+and MagCache threshold $\delta$ ranges from 0.08 to 0.30.
 
-\subsection{Ablation and Sensitivity Analysis}\label{sec:results:ablation}
+% We further validate cross-domain robustness on contemporary
+% visual generation and editing models Frame-Pack\cite{zhang2025framecontextpackingdrift},
+% %,FLUX-Kontext\cite{},
+% covering diverse computational and application scenarios.
 
-This subsection should discuss:
-\begin{itemize}
-    \item Ablation analysis of model components
-    \item Sensitivity analysis of hyperparameters
-\end{itemize}
+\subsection{Text-to-Image Generation}\label{sec:results:text_to_image_generation}
+\input{figures/qualitative}
+
+\textbf{Qualitative Generation.}
+We provide qualitative comparisons across methods
+in \Cref{fig:qual_grid_t2i}.
+Visual quality analysis
+of the generated images
+reveals a clear hierarchy
+in fidelity preservation
+across different acceleration methods.
+$D^3$-Cache
+demonstrates virtually indistinguishable
+visual quality from Baseline
+across all test samples,
+maintaining high consistency
+in overall composition,
+color distribution,
+and textural details.
+In comparison,
+while TaylorSeer preserves the main structural elements
+and overall visual impression
+reasonably well,
+perceptible deviations
+begin to emerge
+in local detail regions,
+such as noticeable alterations in the surface patterns of spherical objects,
+modifications to the geometric shapes of chairs,
+and diminished texture fineness in the teddy bear's fur.
+MagCache and TeaCache
+exhibit substantially more severe quality degradation
+that deviates from the semantic content of the original images:
+conspicuous structural errors
+are observed across multiple samples,
+including erroneous addition of non-existent objects
+such as tree stumps in the scene,
+fundamental alterations to the primary subject matter,
+color attribute shifts in objects,
+and reconfiguration of spatial positional relationships.
+Such semantic-level distortions
+not only result in loss of fine-grained information
+but fundamentally compromise the content integrity
+and visual consistency of the images.
+More critically,
+$D^3$-Cache
+demonstrates superior fidelity
+in fine-grained regions
+compared to other methods,
+more faithfully reproducing Baseline's generative output
+in dimensions
+crucial to visual quality
+such as high-frequency details,
+subtle color variations,
+and intricate textures.
+These visual improvements
+align with the superior LPIPS, SSIM, and PSNR scores
+reported in \Cref{tab:flux-main}.
+More qualitative results are provided in the supplementary material.
+
+\textbf{Quantitative Results.}
+We evaluate $D^3$-Cache
+against representative acceleration baselines
+on two text-to-image models
+(FLUX.1-dev and HiDream-I1-full)
+at \(1024\times1024\)   resolution.
+Overall,
+the results show that $D^3$-Cache
+achieves a consistently better speed--quality trade-off,
+delivering higher quality
+at comparable   speedups
+and lower latency
+at comparable quality.
+
+On FLUX.1-dev,
+the key trend is that $D^3$-Cache
+delivers better perceptual quality
+at a given latency.
+With configuration \(\mathcal{H}{=}2,\mathcal{S}{=}4\),
+it reaches a \(2.55\times\) speedup
+(11.30\,s \(\rightarrow\) 4.43\,s)
+and achieves the best quality
+among methods
+with comparable or lower acceleration:
+LPIPS drops to 0.1420,
+substantially better than TeaCache
+(\(r{=}0.6\), 0.2518)
+and MagCache
+(\(\delta{=}0.08\), 0.1826),
+while also preserving pixel-level structure
+(PSNR/SSIM 23.10\,dB/0.8354).
+At a nearly matched acceleration level,
+$D^3$-Cache
+matches TaylorSeer
+(\(\mathcal{N}{=}5,O{=}1\), \(2.50\times\), 4.52\,s)
+but improves both perceptual and structural metrics
+(LPIPS 0.1420 vs. 0.1435;
+SSIM 0.8354 vs. 0.8205;
+PSNR 23.10\,dB vs. 21.98\,dB),
+indicating that the speedup does not come
+from disproportionately sacrificing fine structure.
+When pushing toward \(3\times\) acceleration,
+$D^3$-Cache
+(\(\mathcal{H}{=}2,\mathcal{S}{=}7\))
+achieves the highest speedup
+at \(3.01\times\) (3.76\,s)
+while maintaining LPIPS/SSIM/PSNR
+of 0.1943/0.7957/21.74\,dB,
+markedly outperforming TaylorSeer
+(\(\mathcal{N}{=}9,O{=}1\), \(2.97\times\), 3.80\,s),
+which degrades to 0.2223/0.7424/18.85\,dB.
+\input{figures/video}
+\input{tables/wan21_vbench_main_selected}
+
+On HiDream-I1-full,
+the improvements are even more pronounced,
+especially on perceptual metrics.
+At modest acceleration,
+$D^3$-Cache
+with \(\mathcal{H}{=}2,\mathcal{S}{=}1\)
+achieves \(1.8\times\) speedup (12.93\,s)
+while retaining strong quality
+(LPIPS 0.0863, FID 21.25, PSNR 24.15\,dB, SSIM 0.8637),
+clearly surpassing MagCache
+(\(\delta{=}0.15\), \(1.83\times\); LPIPS 0.1695, FID 46.32)
+and TaylorSeer
+(\(1.86\times\); LPIPS 0.1352, FID 32.50).
+At higher acceleration,
+$D^3$-Cache
+(\(\mathcal{H}{=}2,\mathcal{S}{=}4\))
+and TaylorSeer
+(\(\mathcal{N}{=}5,O{=}1\))
+run at nearly identical speeds
+(\(3.52\times\), 6.64\,s vs. \(3.51\times\), 6.66\,s),
+but $D^3$-Cache
+maintains substantially higher visual quality
+(LPIPS 0.1780 vs. 0.3030;
+FID 39.10 vs. 66.03;
+SSIM 0.7527 vs. 0.6386),
+suggesting better robustness
+as the sampling budget becomes tight.
+Moreover,
+even under aggressive latency constraints,
+$D^3$-Cache
+further increases acceleration to \(4.32\times\) (5.40\,s)
+while keeping CLIPScore close to the baseline
+(0.2884 vs. 0.2889),
+indicating that text--image alignment
+is largely preserved.
+
+\subsection{Text-to-Video Generation}\label{sec:results:text_to_video_generation}
+
+\textbf{Qualitative Results.}
+We evaluate image generation quality
+across caching methods
+against the baseline
+using three representative text descriptions.
+$D^3$-Cache
+achieve 2.5$\times$ speedup
+while maintaining visual fidelity
+comparable to baseline.
+Generated images
+preserve structural integrity
+in architectural scenes,
+spatial coherence in landscapes,
+and object clarity
+in indoor environments
+without perceptible degradation.
+Alternative caching approaches
+generate substantial noise artifacts
+and quality degradation
+across all scenarios.
+Visible grain, texture artifacts, and color banding
+are prevalent,
+particularly in fine details and gradient regions.
+These accumulated noise artifacts
+during the denoising process
+severely compromise generation quality.
+
+\subsubsection{Quantitative Results.}
+We evaluate $D^3$-Cache on the Wan2.1 text-to-video model
+and compare it against state-of-the-art acceleration methods.
+As shown in \Cref{tab:wan21-vbench-selected},
+$D^3$-Cache achieves competitive or superior performance
+across efficiency and quality metrics.
+In particular, at a comparable acceleration level to TeaCache,
+$D^3$-Cache reaches a $2.61\times$ speedup (\(\mathcal{H}{=}2,\mathcal{S}{=}6\)),
+slightly surpassing TeaCache's $2.58\times$ while delivering a higher VBench score (80.32 vs. 78.35).
+At moderate compression (\(\mathcal{H}{=}2,\mathcal{S}{=}2\)),
+$D^3$-Cache achieves a $2.02\times$ speedup, comparable to TaylorSeer (1.96$\times$),
+but with substantially improved fidelity (PSNR/SSIM/LPIPS = 22.35/0.8012/0.1247),
+outperforming TeaCache (19.42/0.6760/0.2338) and MagCache (20.62/0.7463/0.1686).

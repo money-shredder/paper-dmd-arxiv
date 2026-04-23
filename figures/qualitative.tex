@@ -1,0 +1,156 @@
+\begin{figure}[!t]
+\centering
+\begingroup
+\setlength{\tabcolsep}{0.6pt}
+\renewcommand{\arraystretch}{1.0}
+    \setlength{\fboxsep}{0pt}
+    \setlength{\fboxrule}{0pt}
+    \newcommand{\qualimgw}{0.19\columnwidth}
+    \newcommand{\qualimgh}{0.19\columnwidth}
+    \newcommand{\qualhdrh}{2.2\baselineskip}
+    \newcommand{\qualimgsep}{-1.75ex}
+    \newcommand{\qualrowsep}{3ex}
+    \newcommand{\qualhdrraise}{0.6ex}
+    \newcommand{\qualhdr}[1]{%
+    \parbox[c][\qualhdrh][c]{\qualimgw}{%
+        \centering\small\vphantom{$D^3$}\raisebox{\qualhdrraise}{#1}%
+    }%
+}
+\newcommand{\qualcell}[2][]{%
+    \IfFileExists{#2}{%
+        \parbox[b][\qualimgh][b]{\qualimgw}{%
+        \centering
+        \includegraphics[width=\qualimgw,height=\qualimgh,keepaspectratio]{#2}%
+        }%
+    }{%
+        \fbox{%
+        \parbox[b][\qualimgh][b]{\qualimgw}{%
+                \centering
+                \scriptsize
+                #1%
+            }%
+        }%
+    }%
+}
+\newcommand{\qualdesc}[1]{%
+    \parbox[t]{\qualimgw}{%
+        \centering
+        \scriptsize\bfseries
+        #1%
+    }%
+}%
+\newcommand{\qualsmiley}[1]{%
+    \tikz[
+        baseline=-0.65ex,
+        x=1.15ex,
+        y=1.15ex,
+        external/export next=false
+    ]{%
+        \draw[#1, line width=0.12ex] (0,0) circle (0.95);
+        \fill[#1] (-0.35,0.25) circle (0.12);
+        \fill[#1] (0.35,0.25) circle (0.12);
+        \draw[#1, line width=0.12ex] (-0.45,-0.25)
+        .. controls (0,-0.55) .. (0.45,-0.25);
+    }%
+}
+\newcommand{\qualfrownie}[1]{%
+    \tikz[
+        baseline=-0.65ex,
+        x=1.15ex,
+        y=1.15ex,
+        external/export next=false
+    ]{%
+        \draw[#1, line width=0.12ex] (0,0) circle (0.95);
+        \fill[#1] (-0.35,0.25) circle (0.12);
+        \fill[#1] (0.35,0.25) circle (0.12);
+        \draw[#1, line width=0.12ex] (-0.45,-0.55)
+        .. controls (0,-0.25) .. (0.45,-0.55);
+    }%
+}
+\newcommand{\qualgood}[1]{%
+    {\color{blue!70!black}\qualsmiley{blue!70!black}%
+    \hspace{0.25em}\bfseries\itshape #1}%
+}
+\newcommand{\qualbad}[1]{%
+    {\color{red!70!black}\qualfrownie{red!70!black}%
+    \hspace{0.25em}\bfseries\itshape #1}%
+}
+\newcommand{\qualtag}[1]{%
+    \begingroup
+    \def\qlabel{#1}%
+    \if\relax\detokenize{#1}\relax
+    \else
+        \IfStrEq{\qlabel}{Excellent}{\qualgood{\qlabel}}{%
+        \IfStrEq{\qlabel}{EXCELLENT}{\qualgood{Excellent}}{%
+            \IfStrEq{\qlabel}{excellent}{\qualgood{Excellent}}{%
+            \qualbad{\qlabel}%
+            }%
+        }%
+        }%
+    \fi
+    \endgroup
+}
+\begin{tabular}{@{}c c c c c@{}}
+    \qualhdr{\textbf{Baseline}}
+    & \qualhdr{\textbf{$D^3$-Cache}}
+    & \qualhdr{\textbf{TaylorSeer}}
+    & \qualhdr{\textbf{MagCache}}
+    & \qualhdr{\textbf{TeaCache}} \\[-1pt]
+    \qualcell[FLUX-1]{figures/qual_grid/flux_row1_baseline.png}
+    & \qualcell[FLUX-1]{figures/qual_grid/flux_row1_d3cache.png}
+    & \qualcell[FLUX-1]{figures/qual_grid/flux_row1_taylorseer.png}
+    & \qualcell[FLUX-1]{figures/qual_grid/flux_row1_magcache.png}
+    & \qualcell[FLUX-1]{figures/qual_grid/flux_row1_teacache.png} \\[\qualimgsep]
+    \qualdesc{\qualtag{EXCELLENT}}
+    & \qualdesc{\qualtag{EXCELLENT}}
+    & \qualdesc{\qualtag{Detail Lost}}
+    & \qualdesc{\qualtag{Object Changed}}
+    & \qualdesc{\qualtag{Object Changed}} \\[\qualrowsep]
+    \qualcell[FLUX-2]{figures/qual_grid/flux_row2_baseline.png}
+    & \qualcell[FLUX-2]{figures/qual_grid/flux_row2_d3cache.png}
+    & \qualcell[FLUX-2]{figures/qual_grid/flux_row2_taylorseer.png}
+    & \qualcell[FLUX-2]{figures/qual_grid/flux_row2_magcache.png}
+    & \qualcell[FLUX-2]{figures/qual_grid/flux_row2_teacache.png} \\[\qualimgsep]
+    \qualdesc{\qualtag{EXCELLENT}}
+    & \qualdesc{\qualtag{EXCELLENT}}
+    & \qualdesc{\qualtag{Texture Changed}}
+    & \qualdesc{\qualtag{Color Changed}}
+    & \qualdesc{\qualtag{Detail Lost}} \\[\qualrowsep]
+    % \qualcell[FLUX-3]{figures/qual_grid/flux_row3_baseline.png}
+    % & \qualcell[FLUX-3]{figures/qual_grid/flux_row3_d3cache.png}
+    % & \qualcell[FLUX-3]{figures/qual_grid/flux_row3_taylorseer.png}
+    % & \qualcell[FLUX-3]{figures/qual_grid/flux_row3_magcache.png}
+    % & \qualcell[FLUX-3]{figures/qual_grid/flux_row3_teacache.png} \\[\qualimgsep]
+    % \qualdesc{\qualtag{EXCELLENT}}
+    % & \qualdesc{\qualtag{EXCELLENT}}
+    % & \qualdesc{\qualtag{Detail Lost}}
+    % & \qualdesc{}
+    % & \qualdesc{\qualtag{Overall Inconsistent}} \\[\qualrowsep]
+    \qualcell[FLUX-4]{figures/qual_grid/flux_row4_baseline.png}
+    & \qualcell[FLUX-4]{figures/qual_grid/flux_row4_d3cache.png}
+    & \qualcell[FLUX-4]{figures/qual_grid/flux_row4_taylorseer.png}
+    & \qualcell[FLUX-4]{figures/qual_grid/flux_row4_magcache.png}
+    & \qualcell[FLUX-4]{figures/qual_grid/flux_row4_teacache.png} \\[\qualimgsep]
+    \qualdesc{\qualtag{Excellent}}
+    & \qualdesc{\qualtag{Excellent}}
+    & \qualdesc{\qualtag{Detail Lost}}
+    & \qualdesc{    \qualtag{Object Changed}}
+    & \qualdesc{\qualtag{Overall Inconsistent}} \\[\qualrowsep]
+    \qualcell[FLUX-5]{figures/qual_grid/flux_row5_baseline.png}
+    & \qualcell[FLUX-5]{figures/qual_grid/flux_row5_d3cache.png}
+    & \qualcell[FLUX-5]{figures/qual_grid/flux_row5_taylorseer.png}
+    & \qualcell[FLUX-5]{figures/qual_grid/flux_row5_magcache.png}
+    & \qualcell[FLUX-5]{figures/qual_grid/flux_row5_teacache.png} \\[\qualimgsep]
+    \qualdesc{\qualtag{Excellent}}
+    & \qualdesc{\qualtag{Excellent}}
+    & \qualdesc{\qualtag{Detail Lost}}
+    & \qualdesc{\qualtag{Object Misplaced}}
+    & \qualdesc{\qualtag{Background Changed}} \\
+    \end{tabular}
+    \endgroup
+    \caption{%
+    Qualitative comparison on text-to-image generation.
+    Columns correspond to different methods,
+    and rows correspond to different prompts. Best-viewed with zoom-in.}
+    \label{fig:qual_grid_t2i}
+\end{figure}

@@ -1,0 +1,201 @@
+\begin{table}[t]
+\centering
+\caption{Wan2.1 VBench results for $D^3$-Cache across cache hyperparameters (speedup is relative to the baseline).}
+\label{tab:app:wan21-vbench-8dims}
+\adjustbox{max width=\textwidth}{%
+\begingroup
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.08}
+\newcolumntype{L}{>{\hspace{0.45em}}l<{\hspace{0.45em}}}
+\newcolumntype{C}{>{\hspace{0.35em}}c<{\hspace{0.35em}}}
+\begin{tabular}{L CC CC CCCCCCCC}
+\toprule
+\textbf{Method}
+    & \tbox{$\mathcal{H}$\\\textbf{History}}
+    & \tbox{$\mathcal{S}_{\max}$\\\textbf{Max Skip}}
+    & \tbox{\textbf{Speedup}$\uparrow$}
+    & \tbox{\textbf{Latency (s)}$\downarrow$}
+    & \tbox{\textbf{Overall}\\\textbf{Consistency}$\uparrow$}
+    & \tbox{\textbf{Scene}\\\textbf{Consistency}$\uparrow$}
+    & \tbox{\textbf{Subject}\\\textbf{Consistency}$\uparrow$}
+    & \tbox{\textbf{Background}\\\textbf{Consistency}$\uparrow$}
+    & \tbox{\textbf{Dynamic}\\\textbf{Degree}$\uparrow$}
+    & \tbox{\textbf{Motion}\\\textbf{Smoothness}$\uparrow$}
+    & \tbox{\textbf{Imaging}\\\textbf{Quality}$\uparrow$}
+    & \tbox{\textbf{Aesthetic}\\\textbf{Quality}$\uparrow$} \\
+\midrule
+Baseline
+    & ---
+    & ---
+    & 1.00$\times$
+    & 84.09
+    & 0.227
+    & 0.333
+    & 0.975
+    & 0.993
+    & 0.421
+    & 0.980
+    & 0.702
+    & 0.614 \\
+\midrule
+\multirow{13}{*}{$D^3$-Cache}
+    & 2
+    & 2
+    & 1.86$\times$
+    & 45.16
+    & 0.224
+    & 0.333
+    & 0.977
+    & 0.994
+    & 0.421
+    & 0.979
+    & 0.700
+    & 0.618 \\
+    & 2
+    & 4
+    & 2.20$\times$
+    & 38.15
+    & 0.221
+    & 0.318
+    & 0.979
+    & 0.994
+    & 0.421
+    & 0.978
+    & 0.699
+    & 0.622 \\
+    & 2
+    & 6
+    & 2.35$\times$
+    & 35.73
+    & 0.222
+    & 0.333
+    & 0.979
+    & 0.994
+    & 0.421
+    & 0.978
+    & 0.695
+    & 0.618 \\
+    & 2
+    & 8
+    & 2.45$\times$
+    & 34.26
+    & 0.221
+    & 0.302
+    & 0.980
+    & 0.993
+    & 0.421
+    & 0.977
+    & 0.693
+    & 0.616 \\
+    & 3
+    & 2
+    & 1.85$\times$
+    & 45.38
+    & 0.225
+    & 0.333
+    & 0.976
+    & 0.990
+    & 0.421
+    & 0.980
+    & 0.701
+    & 0.608 \\
+    & 3
+    & 4
+    & 2.18$\times$
+    & 38.51
+    & 0.224
+    & 0.333
+    & 0.976
+    & 0.984
+    & 0.421
+    & 0.978
+    & 0.698
+    & 0.611 \\
+    & 3
+    & 6
+    & 2.19$\times$
+    & 38.38
+    & 0.224
+    & 0.318
+    & 0.978
+    & 0.992
+    & 0.421
+    & 0.979
+    & 0.699
+    & 0.603 \\
+    & 3
+    & 8
+    & 2.30$\times$
+    & 36.52
+    & 0.222
+    & 0.302
+    & 0.975
+    & 0.991
+    & 0.474
+    & 0.975
+    & 0.693
+    & 0.613 \\
+    & 4
+    & 2
+    & 1.84$\times$
+    & 45.64
+    & 0.224
+    & 0.333
+    & 0.973
+    & 0.992
+    & 0.421
+    & 0.979
+    & 0.702
+    & 0.612 \\
+    & 4
+    & 4
+    & 2.09$\times$
+    & 40.20
+    & 0.222
+    & 0.318
+    & 0.977
+    & 0.994
+    & 0.421
+    & 0.979
+    & 0.700
+    & 0.611 \\
+    & 4
+    & 6
+    & 2.17$\times$
+    & 38.68
+    & 0.222
+    & 0.318
+    & 0.977
+    & 0.994
+    & 0.421
+    & 0.979
+    & 0.695
+    & 0.610 \\
+    & 4
+    & 8
+    & 2.24$\times$
+    & 37.48
+    & 0.222
+    & 0.333
+    & 0.979
+    & 0.990
+    & 0.421
+    & 0.978
+    & 0.692
+    & 0.599 \\
+    & 5
+    & 2
+    & 1.77$\times$
+    & 47.43
+    & 0.223
+    & 0.318
+    & 0.977
+    & 0.994
+    & 0.421
+    & 0.979
+    & 0.699
+    & 0.614 \\
+\bottomrule
+\end{tabular}
+\endgroup}
+\end{table}

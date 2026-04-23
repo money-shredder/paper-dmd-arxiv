@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\caption{Peak VRAM footprint (GiB) across models and methods.}
+\label{tab:app:vram:footprint}
+\adjustbox{max width=\textwidth}{%
+\begin{tabular}{lccccc}
+\toprule
+Model & Baseline & TeaCache & MagCache & TaylorSeer (O=1) & $D^3$-Cache \\
+\midrule
+Wan2.1-t2v-1.3B & 18.00 & 18.00 & 18.00 & 45.91 & 21.99 \\
+FLUX.1-dev & 36.78 & 38.82 & 36.78 & 40.97 & 37.24 \\
+HiDream-I1-full & 65.52 & 65.75 & 65.52 & 73.46 & 65.54 \\
+HuanyuanVideo & 71.30 & 72.30 & 71.30 & 94.42 & 73.50 \\
+\bottomrule
+\end{tabular}}
+\end{table}

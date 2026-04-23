@@ -8,6 +8,8 @@
 \usepackage{nicefrac}
 \usepackage{microtype}
 \usepackage{mathtools,bm,amssymb,xcolor}
+\usepackage{colortbl}
+\usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{subcaption,placeins}
 \usepackage{adjustbox,multirow,dcolumn}
@@ -75,7 +77,13 @@
 \usetikzlibrary{external}
 \usepgfplotslibrary{colorbrewer}
 \pgfplotsset{compat=newest}
-\tikzexternalize[prefix=tikz/]
+\ifdefined\pdfshellescape
+  \ifnum\pdfshellescape=1\relax
+    % With latexmk's -output-directory=build, TikZ's externalization prefix is
+    % resolved relative to the output directory.
+    \tikzexternalize[prefix=tikz/]
+  \fi
+\fi
 \newcommand{\tikzsnfn}[1]{%
     \def\fn{#1}\StrSubstitute{\fn}{/}{_}[\fn]%
     \tikzsetnextfilename{\fn}}

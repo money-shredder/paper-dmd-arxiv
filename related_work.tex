@@ -1,0 +1,113 @@
+% !TEX root = paper.tex
+\section{Related Work}\label{sec:related}
+
+\subsection{%
+	Diffusion Models for Image and Video Synthesis}\label{sub:related:diffusion_models}
+
+Diffusion models
+have emerged
+as the dominant paradigm
+for high-fidelity image generation
+and increasingly constitute the foundation for video synthesis applications.
+Foundational works establish generation
+as iterative denoising\cite{%
+	pmlr-v37-sohl-dickstein15, ho2020denoising},
+providing strong baselines
+for image quality benchmarks.
+Score-based formulations
+further connect diffusion
+with denoising score matching
+and establish continuous-time dynamics
+\cite{%
+	song2019generative},
+while recent architectural innovations
+push diffusion beyond GAN performance
+on standard image benchmarks\cite{dhariwal2021diffusionmodelsbeatgans}.
+For video synthesis,
+diffusion models have been extended
+to spatiotemporal settings,
+achieving strong visual quality
+through scalable attention mechanisms
+and efficient broadcasting strategies
+\cite{zhao2025realtimevideogenerationpyramid}.
+
+\subsection{%
+	Acceleration Methods for Diffusion Models}\label{sub:related:acceleration_methods}
+
+Despite the remarkable generation quality
+achieved by diffusion models
+in image and video synthesis,
+their inherently sequential inference procedure
+and substantial computational requirements
+pose significant barriers
+to practical deployment
+and real-time applications.
+Existing approaches
+to accelerating diffusion model inference
+can be broadly categorized as follows:
+
+\textbf{Sampling Acceleration.}
+One fundamental approach to acceleration
+reduces the number of denoising steps
+via fast sampling algorithms,
+including DDIM \cite{song2020denoising},
+ODE/SDE solvers \cite{Karras2022edm,Lu_2025},
+distillation-based methods \cite{salimans2022progressivedistillationfastsampling},
+and consistency training \cite{song2023consistencymodels,luo2023latent}.
+
+\textbf{Diffusion Quantization.}
+Quantization compresses diffusion transformers
+to reduce memory footprint and latency.
+Post-training quantization (PTQ) methods
+optimize deployment without retraining,
+including PTQ4DiT \cite{wu2024ptq4dit},
+which addresses outliers and timestep-wise distribution shifts,
+enabling training-free low-bit quantization.
+SVDQuant \cite{li2024svdquant}
+uses low-rank branches to absorb outliers,
+achieving 4-bit quantization with minimal quality loss.
+For video models,
+Q-VDiT \cite{feng2025q}
+employs token-aware quantization and temporal distillation,
+while ViDiT-Q \cite{zhao2024viditq}
+adopts fine-grained dynamic quantization and mixed precision strategies.
+
+\textbf{Feature Reuse.}
+Given the computational overhead of training-dependent acceleration,
+recent work has focused on training-free methods
+that generalize across diverse diffusion models.
+Feature reuse exploits activation redundancy across denoising steps
+through intermediate caching and reuse,
+offering superior generalizability.
+
+Early approaches apply caching to U-Net-based models:
+DeepCache \cite{Xu_2018} and Faster Diffusion \cite{li2024faster}
+achieve acceleration through selective activation reuse.
+Extending this to Diffusion Transformers,
+FORA \cite{selvaraju2024forafastforwardcachingdiffusion},
+ToCa \cite{zou2024accelerating},
+DuCa \cite{zou2025rethinkingtokenwisefeaturecaching},
+and $\Delta$-DiT \cite{chen2024deltadittrainingfreeaccelerationmethod}
+employ heuristic-based policies
+to cache attention and MLP layer activations.
+
+Prediction-based methods take different approaches.
+TeaCache \cite{liu2024timestep} utilizes carefully
+ curated calibration data to fit polynomial coefficients,
+while MagCache \cite{ma2025magcache}
+achieves calibration with a single random sample.
+TaylorSeer \cite{TaylorSeer2025} and HiCache \cite{feng2025hicachetrainingfreeaccelerationdiffusion}
+employ polynomial-based extrapolation
+to forecast feature evolution,
+enabling prediction of future activations.
+
+\textbf{Distinction from Prior Work:}
+$D^3$-Cache fundamentally differs from existing feature reuse methods
+through its foundation in Dynamic Mode Decomposition.
+While prior approaches rely on heuristics or polynomial fitting,
+$D^3$-Cache learns an optimal linear operator
+via DMD to capture the underlying dynamics of transformer outputs.
+This enables precise prediction of future transformer outputs
+and adaptive skipping of redundant computations,
+achieving superior quality-efficiency trade-offs
+compared to existing cache-based methods.

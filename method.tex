@@ -1,185 +1,301 @@
+% !TEX root = paper.tex
 \section{Method}\label{sec:method}
 
-\subsection{Paper-specific Macros}\label{sub:method:macros}
+\subsection{Preliminaries}\label{sub:method:preliminaries}
 
-It is recommended (and \textbf{compulsory!})
-that you define macros
-in \verb|common.tex|
-for paper-specific macros,
-using \verb|\newcommand|, \verb|\DeclareMathoOperator|, \etc{}
-For example,
-to define a macro \verb|\method{}| for the method name,
-use \verb|\newcommand{\method}{Method}|.
+\textbf{Diffusion model basics.}
+Diffusion models formulate a forward noising process
+over $T$ timesteps for data $\mathbf{x}_0 \sim p_{\text{data}}$
+as
+\begin{equation}
+    q(\mathbf{x}_t \mid \mathbf{x}_{t-1}) = \mathcal{N}\!
+    \left(\mathbf{x}_t; \sqrt{1-\beta_t}\mathbf{x}_{t-1}, \beta_t \mathbf{I}\right),
+    \label{eq:method:prelim:forward}
+\end{equation}
+where $\{\beta_t\}$ is a predefined variance schedule.
+This admits a closed-form solution
+\begin{equation}
+    \mathbf{x}_t =
+    \sqrt{\bar{\alpha}_t}\mathbf{x}_0 +
+    \sqrt{1-\bar{\alpha}_t}\boldsymbol{\epsilon}_t, \quad
+    \boldsymbol{\epsilon}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{I}),
+    \label{eq:method:prelim:forward-closed}
+\end{equation}
+where $\bar{\alpha}_t = \prod_{s=1}^t (1-\beta_s)$.
+The learned reverse process is characterized by
+\begin{equation}
+    p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{c}) = \mathcal{N}\!
+    \left(\mathbf{x}_{t-1};
+    \boldsymbol{\mu}_\theta(\mathbf{x}_t, t, \mathbf{c}),
+    \boldsymbol{\Sigma}_\theta(\mathbf{x}_t, t)\right),
+    \label{eq:method:prelim:reverse}
+\end{equation}
+where $\mathbf{c}$ denotes the conditioning information.
+Sampling begins from $\mathbf{x}_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$,
+iteratively denoising toward $\mathbf{x}_0$.
+
+\textbf{Dynamic Mode Decomposition.}
+Dynamic Mode Decomposition (DMD) models the local temporal evolution
+of a sequence of snapshots
+$\{\mathbf{y}_i\}_{i=1}^m \subset \mathbb{R}^D$
+by a linear operator $\mathbf{A} \in \mathbb{R}^{D \times D}$ such that
+\[
+    \mathbf{y}_{i+1} \approx \mathbf{A}\mathbf{y}_i,
+\]
+or equivalently,
+\[
+    \mathbf{Y} \approx \mathbf{A}\mathbf{X}.
+\]
+Here, $m$ denotes the number of snapshots in the local history window,
+and $D$ denotes the dimension of each snapshot vector.
+In \Cref{sub:method:dmd-cache},
+each $\mathbf{y}_i$ corresponds to a flattened transformer output
+at one denoising step.
+Given snapshots $\{\mathbf{y}_1, \ldots, \mathbf{y}_m\}$,
+the shifted snapshot matrices are defined as
+\begin{equation}
+	\begin{aligned}
+		\mathbf{X} &= [\mathbf{y}_{1}, \ldots, \mathbf{y}_{m-1}]
+		\in \mathbb{R}^{D \times (m-1)}, \\
+		\mathbf{Y} &= [\mathbf{y}_{2}, \ldots, \mathbf{y}_{m}]
+		\in \mathbb{R}^{D \times (m-1)}.
+	\end{aligned}
+	\label{eq:method:xy}
+\end{equation}
+A least-squares approximation of $\mathbf{A}$ is given by
+\[
+    \mathbf{A} \approx \mathbf{Y}\mathbf{X}^{\dagger},
+\]
+where $(\cdot)^{\dagger}$ denotes the Moore--Penrose pseudoinverse.
+
+The compact singular value decomposition of $\mathbf{X}$ is
+\begin{equation}
+	\mathbf{X} = \mathbf{U}_r \boldsymbol{\Sigma}_r \mathbf{V}_r^{\top},
+	\label{eq:method:svd}
+\end{equation}
+where
+$\mathbf{U}_r \in \mathbb{R}^{D \times r}$,
+$\boldsymbol{\Sigma}_r \in \mathbb{R}^{r \times r}$,
+$\mathbf{V}_r \in \mathbb{R}^{(m-1) \times r}$,
+and $r = \min(D, m-1)$.
+The reduced DMD operator
+$\tilde{\mathbf{A}} \in \mathbb{R}^{r \times r}$
+is then defined as
+\begin{equation}
+	\tilde{\mathbf{A}} = \mathbf{U}_r^{\top}\mathbf{Y}\mathbf{V}_r\boldsymbol{\Sigma}_r^{-1}.
+	\label{eq:method:atilde}
+\end{equation}
+The eigendecomposition of $\tilde{\mathbf{A}}$ is
+\begin{equation}
+	\tilde{\mathbf{A}}\mathbf{W} = \mathbf{W}\boldsymbol{\Lambda},
+	\label{eq:method:eig}
+\end{equation}
+where $\mathbf{W} \in \mathbb{C}^{r \times r}$ contains the eigenvectors
+and $\boldsymbol{\Lambda} \in \mathbb{C}^{r \times r}$ is the diagonal matrix
+of eigenvalues.
+The DMD modes
+$\mathbf{\Phi} \in \mathbb{C}^{D \times r}$
+are given by
+\begin{equation}
+	\mathbf{\Phi} = \mathbf{Y}\mathbf{V}_r\boldsymbol{\Sigma}_r^{-1}\mathbf{W}.
+	\label{eq:method:modes}
+\end{equation}
+The modal coefficients associated with the latest snapshot are
+\begin{equation}
+	\mathbf{b} = \mathbf{\Phi}^{\dagger}\mathbf{y}_m.
+	\label{eq:method:coeff}
+\end{equation}
+The one-step prediction is therefore
+\begin{equation}
+	\hat{\mathbf{y}}_{m+1} = \operatorname{Re}\!\left(\mathbf{\Phi}\boldsymbol{\Lambda}\mathbf{b}\right),
+	\label{eq:method:dmd:predict-discrete}
+\end{equation}
+where $\operatorname{Re}(\cdot)$ denotes the real part.
+
+% \subsection{\texorpdfstring{$D^3$-Cache}{D3-Cache}}\label{sub:method:dmd-cache}
+
+\subsection{\textbf{DMD for Diffusion Model.}}\label{sub:method:dmd-cache}
+$D^3$-Cache treats the sequence of diffusion transformer output tensors $\{\mathbf{y}_k\}$
+as a temporal signal
+and applies DMD
+to learn the local linear dynamics
+over short temporal windows.
+This enables a data-driven predictor
+for subsequent transformer outputs,
+allowing us to skip expensive forward passes
+when recent preview errors indicate reliable extrapolation.
+
+\textbf{Output Representation.}
+Diffusion inference proceeds as a discrete-time denoising trajectory
+across timesteps $\{t_k\}_{k=1}^K$.
+The timestep interval is defined as
+\begin{equation}
+\Delta t_k = |t_k - t_{k-1}|,
+\label{eq:method:dt}
+\end{equation}
+which may vary across different inference schedules.
+
+At step $k$,
+the wrapped diffusion transformer produces a primary output tensor:
+\begin{equation}
+\mathbf{y}_k = f_\theta(\mathbf{z}_k, t_k, \mathbf{c}) \in \mathbb{R}^D,
+\label{eq:method:prelim:diffusion}
+\end{equation}
+where $\mathbf{z}_k$ is the current latent state,
+$\mathbf{c}$ is the conditioning signal (e.g., text embedding),
+$\theta$ are the model parameters,
+and $D$ is the flattened output dimension.
+In implementation,
+\(\mathbf{y}_k\) is the primary tensor extracted from the module return value:
+the tensor itself,
+the \texttt{sample} field,
+or the first element of a tuple/list output.
+
+\textbf{Caching Strategy.}
+Unlike layer-wise caching methods that cache intermediate activations
+$\{\mathbf{h}_k^{(\ell)}\}_{\ell=1}^{L}$ from individual blocks,
+$D^3$-Cache operates in the \emph{transformer-output space},
+caching only the primary output tensor $\mathbf{y}_k$ returned by the wrapped module.
+This choice offers several advantages:
+(i) significantly reduced memory footprint compared to storing layer-wise features,
+(ii) direct applicability across architectures with different block structures,
+(iii) natural alignment with the diffusion sampling process.
+
+We maintain a sliding window history buffer
+$\mathcal{H}_k = \{\mathbf{y}_{k-m+1}, \ldots, \mathbf{y}_k\}$
+containing the most recent $m$ outputs.
+This history is updated only upon full forward pass execution.
+Cached predictions are returned to the sampler
+but are \emph{not} added to the history,
+and we cap the number of consecutive cached steps
+to maintain prediction accuracy.
 
 
-\subsection{Cross References}\label{sub:method:crossref}
+\textbf{History Window and Timestep Statistics.}
+We maintain a sliding history window
+containing the most recent $m$ transformer outputs:
+\begin{equation}
+	\mathcal{H}_k = \{ \mathbf{y}_{k-m+1}, \mathbf{y}_{k-m+2}, \ldots, \mathbf{y}_k \},
+	\label{eq:method:history}
+\end{equation}
+and compute the mean timestep interval within this window as
+\begin{equation}
+	\bar{\Delta t}
+	=
+	\frac{1}{|\mathcal{D}_k|} \sum_{\Delta t \in \mathcal{D}_k} \Delta t,
+	\label{eq:method:avg-dt}
+\end{equation}
+where $\mathcal{D}_k = \{\Delta t_{k-m+2}, \ldots, \Delta t_k\}$
+collects the timestep intervals within the history window.
 
-Use \verb|\label{sec:...}|
-to label a section,
-\verb|\label{sec:...:...}|
-to label a subsection,
-\etc{}
+\textbf{DMD Applied to Diffusion Outputs.}
+We treat the sequence of transformer outputs $\{\mathbf{y}_k\}$
+as observations of an underlying dynamical system
+indexed by the denoising step $k$.
+Using the window $\mathcal{H}_k$,
+we construct the DMD snapshot matrices $(\mathbf{X}, \mathbf{Y})$
+as defined in \Cref{eq:method:xy}
+and obtain the DMD components $(\mathbf{\Phi}, \boldsymbol{\Lambda}, \mathbf{b})$
+via the procedure in \Cref{sub:method:preliminaries}.
 
-Use \verb|\label{fig:section:...}| to label a figure,
-\verb|\label{fig:section:figure_name:...}| to label a subfigure,
-and \verb|\label{tab:section:...}| to label a table.
+\textbf{Continuous-Time Extrapolation.}
+To handle variable timestep spacing in diffusion schedules,
+we convert discrete-time eigenvalues to continuous-time frequencies
+via
+\begin{equation}
+	\boldsymbol{\omega} = \frac{1}{\bar{\Delta t}}
+	\log\left(\operatorname{diag}(\boldsymbol{\Lambda})\right),
+	\label{eq:method:omega}
+\end{equation}
+where $\log$ is applied element-wise.
+Thus $\boldsymbol{\omega} \in \mathbb{C}^r$
+in general.
+The predicted output for $t_{k+1}$ is then
+\begin{equation}
+	\hat{\mathbf{y}}_{k+1}(\Delta t_{k+1})
+	=
+	\text{Re}\left(
+		\mathbf{\Phi}
+		\left(
+			\exp(\boldsymbol{\omega} \Delta t_{k+1})
+			\odot
+			\mathbf{b}
+		\right)
+	\right),
+	\label{eq:method:predict}
+\end{equation}
+where $\exp(\cdot)$ is applied element-wise
+and $\odot$ denotes the Hadamard product.
+This formulation reduces to the standard discrete-time DMD prediction
+(Eq.\ref{eq:method:dmd:predict-discrete})
+when timestep spacing is uniform.
 
-Cite papers with \cite{author19shorthand}.
-Cite authors with \citet{author19shorthand}.
-Sometimes you may want to cite a paper
-in parentheses,
-like this: \citep{author19shorthand}
-(note that under this template,
-\verb|\citep| is the same as \verb|\cite|).
+The predicted output is returned to the sampler
+if the adaptive gating criteria
+are satisfied; otherwise,
+a full forward pass is executed to update the history window.
 
-\subsection{Figures}\label{sub:method:figures}
+\subsection{Adaptive Caching Policy}\label{sub:method:adaptive_caching}
 
-For figures,
-use
-\begin{verbatim}
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.75\linewidth]{example}
-    \caption{An example figure.}\label{fig:example}
-\end{figure}
-\end{verbatim}
-to include a figure
-from \verb|figures/example.pdf|.
-It will be rendered as \Cref{fig:example}.
-Use \verb|\subplot| to include subfigures.
-For example,
-to render \Cref{fig:subfigs},
-use
-\begin{verbatim}
-\begin{figure}[ht]
-    \centering
-    % The optional [2] means 2 subfigures per row,
-    % if not specified, it defaults to 1 subfigure per row.
-    % The optional argument [trim=50pt 10pt 50pt 10pt, clip]
-    % trims the figure by 50pt on the left, 10pt on the bottom,
-    % 50pt on the right, and 10pt on the top,
-    % and clips the figure to the specified size.
-    % The argument {example} points to figures/example.pdf.
-    % The argument {An example subfigure A.} is the caption.
-    % The argument {fig:example:a} is the label.
-    \subplot[2][
-        trim=50pt 10pt 50pt 10pt, clip
-    ]{example}{An example subfigure A.}{fig:example:a}
-    \subplot[2][
-        trim=50pt 10pt 50pt 10pt, clip
-    ]{example}{An example subfigure B.}{fig:example:b}
-    \caption{An example figure with subfigures.}\label{fig:example}
-\end{figure}
-\end{verbatim}
+\textbf{Preview Error.}
+Besides the history buffer,
+the cache stores the most recent preview error
+computed from an exact forward pass.
+Whenever a valid timestep interval is available,
+we can form a \emph{preview} prediction
+\(\tilde{\mathbf{y}}_{k+1}\)
+from the current history
+without consuming the skip budget.
+After running the exact transformer
+and obtaining \(\mathbf{y}_{k+1}\),
+we update the gate signal using the batch-averaged relative \( \ell_2 \) error
+\begin{equation}
+	e_{k+1}
+	=
+	\frac{1}{B}
+	\sum_{b=1}^{B}
+	\frac{
+		\left\|
+			\mathrm{vec}\!\left(\tilde{\mathbf{y}}_{k+1}^{(b)}\right)
+			-
+			\mathrm{vec}\!\left(\mathbf{y}_{k+1}^{(b)}\right)
+		\right\|_2
+	}{
+		\left\|
+			\mathrm{vec}\!\left(\mathbf{y}_{k+1}^{(b)}\right)
+		\right\|_2
+	},
+	\label{eq:method:gate-error}
+\end{equation}
+where \(B\) is the batch size,
+and \(\mathrm{vec}(\cdot)\) flattens each transformer output tensor
+into a vector in \(\mathbb{R}^D\).
+This matches the implementation,
+which compares the preview prediction
+against the actual transformer output directly
+instead of using auxiliary energy-ratio
+or condition-number diagnostics.
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.75\textwidth]{example}
-    \caption{An example figure.}\label{fig:example}
-\end{figure}
-\begin{figure}[ht]
-    \centering
-    % The optional [2] means 2 subfigures per row,
-    % if not specified, it defaults to 1 subfigure per row.
-    % The optional argument [trim=50pt 10pt 50pt 10pt, clip]
-    % trims the figure by 50pt on the left, 10pt on the bottom,
-    % 50pt on the right, and 10pt on the top,
-    % and clips the figure to the specified size.
-    % The argument {example} points to figures/example.pdf.
-    % The argument {An example subfigure A.} is the caption.
-    % The argument {fig:subfigs:a} is the label.
-    \subplot[2][trim=50pt 10pt 50pt 10pt, clip]{example}{%
-        An example subfigure A.
-    }{fig:subfigs:a}%
-    \subplot[2][trim=50pt 10pt 50pt 10pt, clip]{example}{%
-        An example subfigure B.
-    }{fig:subfigs:b}\hpad
-    \caption{An example figure with subfigures.}\label{fig:subfigs}
-\end{figure}
+\textbf{Adaptive Gating Policy.}
+The caching decision is governed by the following hyperparameters:
+$S_{\max}$ is the maximum consecutive cached steps,
+which prevents error accumulation and long-range drift; and
+\(\delta_g\) is the gate threshold applied to the most recent preview error.
+$s_k$ is the current skip counter tracking consecutive cached steps
+since the last full computation.
 
-
-\subsection{Math Symbols and Formulae}\label{sub:method:mathematics}
-
-It is recommended (and \textbf{compulsory!})
-that you define macros
-in \verb|common.tex|
-for math symbols,
-and these macros
-can be customized easily later.
-To standardize math symbols,
-use the following to construct macros:
-\begin{itemize}
-
-    \item Random variables:
-    \( \ra, \rb, \rc \).
-
-    \item Random vectors:
-    \( \rva, \rvb, \rvc \).
-
-    \item Elements of random vectors:
-    \( \erva, \ervb, \ervc \).
-
-    \item Random matrices:
-    \( \rmA, \rmB, \rmC \).
-
-    \item Elements of random matrices:
-    \( \ermA, \ermB, \ermC \).
-
-    \item Vectors:
-    \( \vzero, \vone, \va, \vb, \vc \).
-
-    \item Elements of vectors:
-    \( \eva, \evb, \evc \).
-
-    \item Matrix:
-    \( \mA, \mB, \mC \).
-
-    \item Entries of a matrix:
-    \( \emA, \emB, \emC \).
-
-    \item Tensor:
-    \( \tA, \tB, \tC \).
-
-    \item Entries of a tensor:
-    \( \etA, \etB, \etC \).
-
-    \item Sets:
-    \( \sA, \sB, \sC \).
-
-    \item Underlying data generating distribution
-    \( \pdata \),
-    empirical distribution defined by the training set
-    \( \ptrain \),
-    model distribution \( \pmodel, \ptildemodel \),
-    autoencoder distributions \( \pencode, \pdecode, \precons \).
-
-    \item Functions:
-    Expectation \( \E \),
-    loss \( \Ls \),
-    KL divergence \( \KL \),
-    Variance \( \Var \),
-    \etc{}
-
-    \item Norms:
-    \( \normlzero \), \( \normlone \), \( \normltwo \),
-    \( \normlp \), \( \normmax \).
-
-    \item Others:
-    \( \argmax \), \( \argmin \), \( \sign \)
-
-\end{itemize}
-
-Use \verb|\(...\)| to surround inline math,
-avoid using \verb|$...$|.
-Use \verb|\begin{equation}| and \verb|\end{equation}|
-for display-style equations,
-and
-\begin{verbatim}
-    \begin{equation}
-        \begin{aligned}
-            ...
-        \end{aligned}\label{eq:abc}
-    \end{equation}
-\end{verbatim}
-for multi-line equations.
-Use \verb|\cref{eq:abc}| to reference the equation above.
+At step \(k+1\),
+the cache is invoked only when both conditions below are satisfied:
+\begin{equation}
+	\label{eq:method:gating}
+	\begin{aligned}
+		e_k &\le \delta_g, \\
+		s_k &< S_{\max}
+	\end{aligned}
+\end{equation}
+Otherwise, or whenever the history/timestep state is insufficient,
+a full forward pass
+$\mathbf{y}_{k+1} = f_\theta(\mathbf{z}_{k+1}, t_{k+1}, \mathbf{c})$
+is executed,
+the preview error is refreshed using \Cref{eq:method:gate-error},
+and the history buffer is updated accordingly.
