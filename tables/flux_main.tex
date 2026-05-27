@@ -1,12 +1,11 @@
 \begin{table}[t]
 \centering
-% \adjustbox{max width=\linewidth}{%
 \begingroup
 \setlength{\tabcolsep}{0.25em}
 \renewcommand{\arraystretch}{1.08}
 \newcolumntype{L}{>{\hspace{0.45em}}l<{\hspace{0.45em}}}
 \newcolumntype{C}{>{\hspace{0.35em}}c<{\hspace{0.35em}}}
- \begin{tabular}{LCC CCCCC}
+\begin{tabular}{LCC CCCCC}
 \toprule
 \multirow{2}{*}{\textbf{Method}}
     & \multicolumn{2}{c}{\textbf{Efficiency}}
@@ -24,85 +23,86 @@
 \midrule
 Original 50 steps
     & 1.00$\times$
-    & 11.30
+    & 38.24
     & ---
     & ---
     & ---
     & ---
-    & 0.2769 \\
-TeaCache ($r=0.6$)
-    & 2.14$\times$
-    & 5.28
-    & 70.72
-    & 17.93
-    & 0.7462
-    & 0.2518
-    & 0.2754 \\
-MagCache ($\delta=0.08$)
-    & 2.12$\times$
-    & 5.34
-    & 54.41
-    & 20.70
-    & 0.8061
-    & 0.1826
-    & 0.2755 \\
-TaylorSeer ($N=5$,$O=1$)
-    & 2.50$\times$
-    & 4.52
-    & 45.51
-    & 21.98
-    & 0.8205
-    & 0.1435
-    & \textbf{0.2772} \\
-\rowcolor{gray!35}$D^3$-Cache ($\mathcal{H}{=}2$,$\mathcal{S}{=}4$)
-    & \textbf{2.55$\times$}
-    & \textbf{4.43}
-    & \textbf{44.57}
-    & \textbf{23.10}
-    & \textbf{0.8354}
-    & \textbf{0.1420}
-    & 0.2768 \\
+    & --- \\
+50\% steps
+    & 1.95$\times$
+    & 19.58
+    & 63.41
+    & 18.61
+    & 0.7742
+    & 0.2174
+    & 0.2744 \\
 \midrule
-TeaCache ($r=0.8$)
-    & 2.43$\times$
-    & 4.65
-    & 72.25
-    & 17.85
-    & 0.7384
-    & 0.2604
-    & 0.2754 \\
-MagCache ($\delta=0.24$)
-    & 2.77$\times$
-    & 4.08
-    & 57.22
-    & 20.31
-    & 0.7862
-    & 0.1988
+TeaCache ($r{=}0.5$)
+    & 2.39$\times$
+    & 16.00
+    & 79.75
+    & 16.52
+    & 0.7054
+    & 0.2984
+    & 0.2748 \\
+MagCache ($\delta{=}0.12$, $K{=}4$)
+    & 2.44$\times$
+    & 15.66
+    & 54.53
+    & 20.84
+    & 0.8087
+    & 0.1777
+    & 0.2759 \\
+TaylorSeer ($N{=}4$,$O{=}1$)
+    & 2.39$\times$
+    & 15.98
+    & 36.54
+    & 23.57
+    & 0.8667
+    & 0.1068
+    & \textbf{0.2771} \\
+\rowcolor{gray!35}$\mathrm{D}^3$-Cache ($\mathcal{H}{=}2$,$S{=}2$)
+    & \textbf{2.52$\times$}
+    & \textbf{15.17}
+    & \textbf{31.35}
+    & \textbf{25.34}
+    & \textbf{0.8835}
+    & \textbf{0.0930}
+    & 0.2764 \\
+\midrule
+TeaCache ($r{=}0.7$)
+    & 3.06$\times$
+    & 12.52
+    & 88.68
+    & 15.89
+    & 0.6825
+    & 0.3274
     & 0.2761 \\
-TaylorSeer ($N=9$,$O=1$)
-    & 2.97$\times$
-    & 3.80
-    & 68.59
-    & 18.85
-    & 0.7424
-    & 0.2223
-    & 0.2767\\
-\rowcolor{gray!35}$D^3$-Cache ($\mathcal{H}{=}2$,$\mathcal{S}{=}6$)
-    & 2.92$\times$
-    & 3.86
-    & 59.23
-    & \textbf{21.80}
-    & \textbf{0.8032}
-    & \textbf{0.1826}
-    & \textbf{0.2770}    \\[-0.4pt]
-\rowcolor{gray!35}$D^3$-Cache ($\mathcal{H}{=}2$,$\mathcal{S}{=}7$)
-	    & \textbf{3.01$\times$}
-	    & \textbf{3.76}
-	    & \textbf{61.93}
-	    & \textbf{21.74}
-	    & \textbf{0.7957}
-	    & \textbf{0.1943}
-	    & \textbf{0.2768} \\
+MagCache ($\delta{=}0.24$, $K{=}5$)
+    & 3.13$\times$
+    & 12.23
+    & 56.81
+    & 20.40
+    & 0.7929
+    & 0.1937
+    & 0.2754 \\
+TaylorSeer ($N{=}6$,$O{=}1$)
+    & 3.08$\times$
+    & 12.42
+    & 48.52
+    & 21.30
+    & 0.8184
+    & 0.1536
+    & \textbf{0.2774} \\
+\rowcolor{gray!35}$\mathrm{D}^3$-Cache ($\mathcal{H}{=}2$,$S{=}4$)
+    & \textbf{3.61$\times$}
+    & \textbf{10.59}
+    & \textbf{46.16}
+    & \textbf{22.95}
+    & \textbf{0.8275}
+    & \textbf{0.1520}
+    & 0.2758 \\
 \midrule
 \multicolumn{8}{c}{\textbf{HiDream-I1-full 1024$\times$1024}} \\
 \midrule
@@ -114,89 +114,82 @@ Original 50 steps
     & ---
     & ---
     & 0.2889 \\
-TeaCache ($r=0.2$)
-    & 1.65$\times$
-    & 14.11
-    & 34.01
-    & 20.05
-    & 0.7929
-    & 0.1518
-    & 0.2901 \\
-MagCache ($\delta=0.15$)
-    & 1.83$\times$
-    & 12.71
-    & 46.32
-    & 20.88
-    & 0.7832
-    & 0.1695
-    & \textbf{0.2904} \\
-TaylorSeer ($N=2$,$O=1$)
-    & 1.86$\times$
-    & 12.56
-    & 32.50
-    & 21.13
-    & 0.8044
-    & 0.1352
-    & 0.2890       \\
-\rowcolor{gray!35}$D^3$-Cache ($\mathcal{H}{=}2$,$\mathcal{S}{=}1$)
-    & 1.80$\times$
-    & 12.93
-    & \textbf{21.25}
-    & \textbf{24.15}
-    & \textbf{0.8637}
-    & \textbf{0.0863}
-    & 0.2878 \\[-0.4pt]
-\rowcolor{gray!35}$D^3$-Cache ($\mathcal{H}{=}2$,$\mathcal{S}{=}2$)
-    & \textbf{2.49$\times$}
-    & \textbf{9.36}
-    & \textbf{29.19}
-    & \textbf{22.19}
-    & \textbf{0.8148}
-    & \textbf{0.1212}
-    & 0.2883 \\
+50\% steps
+    & 1.84$\times$
+    & 12.46
+    & 66.34
+    & 14.34
+    & 0.6150
+    & 0.4052
+    &  \\
 \midrule
-TeaCache ($r=0.8$)
-    & 3.50$\times$
-    & 6.67
-    & 43.95
-    & 18.55
-    & 0.7371
-    & 0.1970
-    & 0.2880 \\
-MagCache ($\delta=0.24$)
-    & 3.47$\times$
-    & 6.72
-    & 57.46
-    & 18.60
-    & 0.7392
-    & 0.1835
-    & 0.2879 \\
-TaylorSeer ($N=5$,$O=1$)
-    & 3.51$\times$
-    & 6.66
-    & 66.03
-    & 16.01
-    & 0.6386
-    & 0.3030
-    & 0.2880\\
-\rowcolor{gray!35}$D^3$-Cache ($\mathcal{H}{=}2$,$\mathcal{S}{=}4$)
-    & \textbf{3.52$\times$}
-    & \textbf{6.64}
-    & \textbf{39.10}
-    & \textbf{20.17}
-    & \textbf{0.7527}
-    & \textbf{0.1780}
-    & \textbf{0.2882} \\[-0.4pt]
-\rowcolor{gray!35}$D^3$-Cache ($\mathcal{H}{=}2$,$\mathcal{S}{=}7$)
-    & \textbf{4.32$\times$}
-    & \textbf{5.40}
-    & \textbf{51.81}
-    & \textbf{18.74}
-    & \textbf{0.7052}
-    & \textbf{0.2264}
-    & \textbf{0.2884} \\
+TeaCache ($r{=}0.4$)
+    & 2.16$\times$
+    & 10.62
+    & 35.58
+    & 21.04
+    & 0.7466
+    & 0.2029
+    &  \\
+MagCache ($\delta{=}0.24$, $K{=}5$)
+    & 1.74$\times$
+    & 13.13
+    & 102.39
+    & 14.46
+    & 0.5604
+    & 0.4604
+    &  \\
+TaylorSeer ($N{=}3$,$O{=}1$)
+    & 2.35$\times$
+    & 9.76
+    & 39.12
+    & 19.95
+    & 0.7520
+    & 0.2177
+    &  \\
+\rowcolor{gray!35}$\mathrm{D}^3$-Cache ($\mathcal{H}{=}2$,$S{=}5$)
+    & \textbf{2.36$\times$}
+    & \textbf{9.72}
+    & \textbf{21.53}
+    & \textbf{24.20}
+    & \textbf{0.8644}
+    & \textbf{0.1048}
+    &  \\
+\midrule
+TeaCache ($r{=}0.9$)
+    & 3.25$\times$
+    & 7.04
+    & 47.56
+    & 18.89
+    & 0.6804
+    & 0.2707
+    &  \\
+MagCache ($\delta{=}0.30$, $K{=}5$)
+    & 1.88$\times$
+    & 12.21
+    & 206.40
+    & 10.26
+    & 0.1412
+    & 0.9631
+    &  \\
+TaylorSeer ($N{=}5$,$O{=}1$)
+    & 3.23$\times$
+    & 7.08
+    & 64.44
+    & 16.42
+    & 0.6479
+    & 0.3545
+    &  \\
+\rowcolor{gray!35}$\mathrm{D}^3$-Cache ($\mathcal{H}{=}2$,$S{=}5$)
+    & \textbf{3.32$\times$}
+    & \textbf{6.90}
+    & \textbf{38.20}
+    & \textbf{20.57}
+    & \textbf{0.7807}
+    & \textbf{0.1891}
+    &  \\[-0.4pt]
 \bottomrule
 \end{tabular}
-\endgroup%}
+\endgroup
 \caption{Quantitative comparison on Text-to-Image Models.}\label{tab:flux-main}
 \end{table}

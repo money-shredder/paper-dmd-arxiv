@@ -481,7 +481,7 @@ def main() -> int:
             f.write("\\toprule\n")
             f.write(
                 "Model & Baseline & TeaCache & MagCache & TaylorSeer (O="
-                f"{args.taylorseer_order_for_method_plot}) & $D^3$-Cache \\\\\n"
+                f"{args.taylorseer_order_for_method_plot}) & $\\mathrm{{D}}^3$-Cache \\\\\n"
             )
             f.write("\\midrule\n")
             method_map = {

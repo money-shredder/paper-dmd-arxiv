@@ -1,18 +1,18 @@
 % !TEX root = paper.tex
 \section{Conclusion}\label{sec:conclusion}
 
-This paper introduces $D^3$-Cache,
+This paper introduces $\mathrm{D}^3$-Cache,
 a training-free acceleration method
 for diffusion inference
 that leverages Dynamic Mode Decomposition.
 By fitting a low-rank linear model
 to short-window transformer-output dynamics
 and gating cached reuse with measured relative-\( \ell_2 \) preview error,
-$D^3$-Cache predicts denoising updates
+$\mathrm{D}^3$-Cache predicts denoising updates
 and skips redundant forward passes.
 Across text-to-image (FLUX.1-dev, HiDream-I1-full)
-and text-to-video (Wan2.1, HunyuanVideo) models,
-$D^3$-Cache delivers consistent over 2.5$\times$ speedups
+and text-to-video (Wan2.1) models,
+$\mathrm{D}^3$-Cache delivers consistent over 2.5$\times$ speedups
 while preserving perceptual quality,
 outperforming TeaCache, MagCache, and TaylorSeer
 in speed-quality trade-offs

@@ -11,12 +11,12 @@
         \includegraphics[width=\linewidth]{figures/motivation/rel_l2_vs_step.png}
     \end{subfigure}
     \caption{
-        Similarity of transformer outputs across consecutive diffusion steps.
-        Left: cosine similarity of transformer outputs between consecutive steps.
-        Right: relative change of transformer outputs between consecutive steps.
-        Both plots report the mean and inter-quantile band (p10--p90) across Drawbench200 dataset at each denoising step.
+        Step-to-step consistency of transformer outputs along the denoising trajectory.
+        Left: cosine similarity between transformer outputs at consecutive denoising steps.
+        Right: relative $\ell_2$ change between transformer outputs at consecutive denoising steps.
+        Curves correspond to FLUX.1-dev, Hi-Dream, and Wan2.1; shaded regions denote the inter-quantile range (p10--p90) over prompts from the DrawBench200 dataset at each step.
     }\label{fig:motivation-latent-similarity}
-    \vspace{-20pt}
+    \vspace{-15pt}
 \end{figure}
 
 Diffusion models \cite{ho2020denoising,
@@ -25,29 +25,23 @@ dhariwal2021diffusionmodelsbeatgans,
 pmlr-v37-sohl-dickstein15,
 song2019generative,
 rombach2021highresolution}
-have achieved state-of-the-art performance
-and garnered considerable attention
-as leading methodologies
-in the field of generative modeling,
-particularly excelling in image \cite{saharia2022photorealistic,chen2023pixartalpha,podell2023sdxlimprovinglatentdiffusion},
-and video \cite{videoworldsimulators2024,ma2025latte} synthesis tasks.
-To further scale model capacity and improve generation quality,
-recent research has shifted the architectural paradigm
+have emerged as a prominent paradigm in generative modeling,
+demonstrating strong empirical performance across a wide range of tasks,
+particularly in image \cite{saharia2022photorealistic,chen2023pixartalpha,podell2023sdxlimprovinglatentdiffusion}
+and video \cite{videoworldsimulators2024,ma2025latte} synthesis.
+To further improve model capacity and generation quality,
+recent work has increasingly transitioned
 from convolutional U-Net backbones \cite{ronneberger2015unetconvolutionalnetworksbiomedical,ho2020denoising}
 to Diffusion Transformers (DiT) \cite{Peebles2022DiT,bao2022all},
-which substantially enhance modeling capability.
+which provide a more scalable architecture for high-capacity diffusion modeling.
 
 \input{figures/architecture.tex}
-Despite the state-of-the-art performance,
-this architectural advancement
-introduces elevated computational cost
-resulting in substantially prolonged inference latency.
-The computational burden
-is further exacerbated
-by the sequential and multi-step iterative sampling procedure
-characteristic of diffusion models \cite{shih2023paradigms},
-wherein each sampling step
-necessitates a complete forward pass through the network.
+
+However, these architectural advances come at a significant computational cost,
+resulting in substantially increased inference latency.
+This inefficiency is further amplified by the inherently sequential,
+multi-step sampling process of diffusion models \cite{shih2023paradigms},
+in which each denoising step requires a full forward pass through the network.
 % Additionally,
 % conventional acceleration paradigms
 % such as post-training quantization
@@ -59,6 +53,7 @@ necessitates a complete forward pass through the network.
 % both methodologies entail supplementary training procedures,
 % which substantially undermines their generalizability
 % and practical scalability across heterogeneous model architectures.
+
 Based on the observation that consecutive diffusion steps
 exhibit feature similarities,
 feature reuse methods \cite{
@@ -69,15 +64,17 @@ feature reuse methods \cite{
     zou2025rethinkingtokenwisefeaturecaching}
 have been proposed to accelerate generation
 by strategically caching
-and reusing intermediate activations
+and reusing intermediate outputs
 across successive denoising iterations.
 
-However,
-existing cache-based methods
-often rely on static reuse strategies
-or hand-tuned similarity thresholds,
-which are misaligned with the non-uniform difficulty
-of diffusion timesteps.
+Existing cache-based methods
+typically couple cache reuse with per-model calibration artifacts,
+including fitted coefficient tables,
+step-dependent reference schedules,
+or fixed-order functional expansions.
+While effective,
+these mechanisms are specified in advance
+rather than estimated online from the current feature trajectory.
 In practice,
 the amount of inter-step change
 varies across the denoising trajectory:
@@ -88,10 +85,10 @@ This motivates a predictive, confidence-aware mechanism
 that can adapt reuse decisions online,
 skipping computation when dynamics are stable
 and falling back when they are not.
-We investigate the activation patterns across consecutive denoising steps
-by measuring cosine similarity
-and relative change
-between consecutive transformer outputs:
+
+To characterize the evolution of transformer outputs along the denoising trajectory,
+we quantify the cosine similarity and relative change
+between transformer outputs at consecutive steps:
 \begin{equation}
     \begin{aligned}
         s_k &=
@@ -104,67 +101,52 @@ between consecutive transformer outputs:
     \label{eq:intro:step-similarity}
 \end{equation}
 As shown in \Cref{fig:motivation-latent-similarity},
-most intermediate steps exhibit high cosine similarity
-and low relative change with tight inter-quantile bands,
-showing that adjacent transformer outputs remain highly aligned
-throughout the denoising process.
-Taken together,
-these trends suggest that,
+most intermediate denoising steps exhibit cosine similarity close to one
+and small relative change, together with narrow inter-quantile bands across prompts,
+indicating that adjacent transformer outputs remain strongly consistent
+and vary smoothly over these regions of the trajectory.
+By contrast,
+larger deviations are concentrated primarily in the early and late stages.
+These trends suggest that,
 over short temporal windows,
-the denoising trajectory is not only strongly coherent
-but also evolves in an approximately linear manner
+the denoising trajectory is strongly coherent
+and can be well approximated by a locally linear evolution
 in feature space.
-This observation naturally motivates
-Dynamic Mode Decomposition (DMD) \cite{kutz2016dynamic,dey2022dynamicmodedecompositionkoopman},
-which approximates a dynamical system
-with a local linear evolution operator
-estimated directly from a sequence of snapshots.
+These observations suggest the use of a predictive mechanism
+capable of capturing local dynamics from short feature trajectories.
+Dynamic Mode Decomposition (DMD) \cite{kutz2016dynamic,dey2022dynamicmodedecompositionkoopman}
+provides exactly such a mechanism
+by fitting a local linear evolution operator to a sequence of snapshots.
 
 This perspective is particularly appealing
-when compared with existing cache forecasting strategies.
-TaylorSeer \cite{TaylorSeer2025}
-and HiCache \cite{feng2025hicachetrainingfreeaccelerationdiffusion}
-predict future features
-through fixed polynomial bases,
-such as Taylor or Hermite expansions,
-whose extrapolation behavior is tied
-to a prescribed basis and expansion order.
+relative to existing feature reuse strategies.
 TeaCache \cite{liu2024timestep}
 and MagCache \cite{ma2025magcache},
-in contrast,
-rely on predesigned rescaling functions,
-calibrated magnitude ratios,
-and hand-tuned thresholds
-to determine when cached outputs should be reused.
+for instance,
+determine cache reuse through model-specific,
+offline-calibrated control profiles,
+including fitted rescaling coefficients,
+step-wise magnitude-ratio schedules; 
+these controls are specified in advance
+rather than updated online from the current feature trajectory.
+TaylorSeer \cite{TaylorSeer2025}
+and HiCache \cite{feng2025hicachetrainingfreeaccelerationdiffusion}
+instead extrapolate future features
+through Taylor- and Hermite-based analytic expansions,
+with the resulting forecasts determined
+by the prescribed basis and expansion order.
+As the extrapolation order or forecasting horizon increases,
+such fixed-form expansions can become more sensitive to approximation error,
+leading to noticeable quality degradation under more aggressive reuse.
 By comparison,
-DMD estimates its evolution operator online
-from the recent activation history itself,
-so the effective extrapolation coefficients
-are adapted to the observed local dynamics
-rather than fixed in advance, which makes 
-DMD better suited
-to non-uniform timestep spacing,
-where the difficulty of prediction
-can vary substantially along the denoising trajectory.
+DMD estimates its evolution operator online from recent output histories,
+allowing the extrapolation coefficients to adapt to local dynamics.
+Reuse decisions are then made by comparing the predicted and exact next-step outputs,
+so that cached outputs are reused only when the observed prediction error
+falls below a preset threshold.
+This makes DMD better suited to non-uniform timestep spacing,
+where prediction difficulty can vary substantially along the denoising trajectory.
 
-
-Based on the DMD predictor,
-we estimate the next-step activation
-and compare it with the subsequent exact transformer output
-through the prediction error:
-\begin{equation}
-    e_k =
-    \frac{\|\hat{\mathbf{y}}_k - \mathbf{y}_k\|_2}
-    {\|\mathbf{y}_k\|_2},
-    \label{eq:intro:prediction-error}
-\end{equation}
-Cached outputs are reused only when:
-\begin{equation}
-    e_k < \tau.
-    \label{eq:intro:reuse-gate}
-\end{equation}
-This ties the skip decision directly
-to observed forecasting accuracy.
 % To quantify this phenomenon,
 % \Cref{fig:motivation-latent-similarity}
 % shows tight inter-quantile bands for most intermediate steps,
@@ -187,11 +169,12 @@ to observed forecasting accuracy.
 % the evolutionary process of diffusion
 % can be similarly characterized
 % through Dynamic Mode Decomposition.
+
 Motivated by this insight,
-we propose $D^3$-Cache,
+we propose $\mathrm{D}^3$-Cache,
 a dynamic caching strategy
-that leverages DMD-based modal analysis
-to predict transformer outputs online
+that leverages Dynamic Mode Decomposition (DMD) to 
+predict transformer outputs online
 and gate cache reuse with the observed prediction error,
 thereby enabling selective skipping of expensive forward passes
 without compromising generation fidelity.
@@ -200,31 +183,32 @@ without compromising generation fidelity.
 \quad In summary,
 our contributions are as follows:
 \begin{itemize}[leftmargin=*,itemsep=2pt, topsep=0pt, parsep=0pt]
-\item \textbf{Observation of Strong Inter-Step Structure:}
+\item \textbf{Empirical Characterization of Inter-Step Dynamics:}
 We show that transformer outputs across consecutive diffusion steps
-exhibit high cosine similarity and low relative change,
-revealing strong temporal coherence throughout the denoising process.
-Moreover, for most intermediate steps,
+exhibit strong local temporal coherence,
+characterized by high cosine similarity and low relative change.
+Furthermore, for most intermediate denoising steps,
 the output trajectory is well approximated by a locally linear evolution,
-which motivates linear dynamical modeling for cache forecasting.
+providing a concrete basis for dynamical forecasting of cached features.
 
-\item \textbf{$D^3$-Cache:}
-We introduce $D^3$-Cache,
-a training-free diffusion acceleration framework
-that uses Dynamic Mode Decomposition
+\item \textbf{$\mathrm{D}^3$-Cache:}
+We introduce \textbf{$\mathrm{D}^3$-Cache},
+a training-free acceleration framework
+that leverages Dynamic Mode Decomposition
 to model the short-horizon evolution
 of diffusion transformer outputs
-from only a small number of recent activation snapshots.
-Combined with prediction-error-based gating,
-$D^3$-Cache provides a lightweight
-and efficient cache reuse strategy.
+from only a small number of recent output snapshots.
+Coupled with prediction-error-based gating,
+$\mathrm{D}^3$-Cache enables dynamic, online cache reuse
+via computationally efficient forecasting.
 
 
-\item \textbf{State-of-the-Art Performance of $D^3$-Cache:}
+\item \textbf{Superior Performance of $\mathrm{D}^3$-Cache:}
 Comprehensive experiments on state-of-the-art diffusion models
-(FLUX.1 \cite{flux2024}, HiDream-I1-full \cite{hidreami1technicalreport}, Wan2.1 \cite{wan2025}, and HunyuanVideo \cite{kong2024hunyuanvideo})
-demonstrate that $D^3$-Cache achieves over 2.5x computational acceleration consistently.
-Compared with existing cache-based acceleration methods at iso-speedup conditions,
-$D^3$-Cache significantly outperforms in generation fidelity,
-yielding superior visual quality for both image and video synthesis.
+(FLUX.1 \cite{flux2024}, HiDream-I1-full \cite{hidreami1technicalreport}, and Wan2.1 \cite{wan2025})
+show that $\mathrm{D}^3$-Cache consistently achieves more than $2.5\times$
+computational acceleration.
+Under iso-speedup comparisons with existing cache-based acceleration methods,
+$\mathrm{D}^3$-Cache delivers substantially better generation fidelity
+and superior visual quality across both image and video synthesis tasks.
 \end{itemize}

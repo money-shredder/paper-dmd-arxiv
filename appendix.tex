@@ -1,109 +1,9 @@
 % !TEX root = paper.tex
 % \section{Proofs of Theorems}\label{app:proofs}
 
-\section{Experimental Details}\label{app:setup}
+\section{Dynamic Mode Decomposition Theory}\label{app:dmd-theory}
 
-\subsection{Model Configurations}\label{app:setup:model_configurations}
-\textbf{FLUX.1-dev.}~\cite{flux2024}
-We align the evaluation setup across compared acceleration methods
-under the same sampling and hardware configuration.
-
-\textbf{HiDream-I1-full.}~\cite{hidreami1technicalreport}
-We align the evaluation setup across compared acceleration methods
-under the same sampling and hardware configuration.
-
-\textbf{Wan2.1.}~\cite{wan2025}
-We align the evaluation setup across compared acceleration methods
-under the same sampling and hardware configuration.
-
-\textbf{HunyuanVideo.}~\cite{kong2024hunyuanvideo}
-We align the evaluation setup across compared acceleration methods
-under the same sampling and hardware configuration.
-Note that due to TaylorSeer's memory requirements exceeding a single H800 GPU capacity,
-we evaluate it on four H20 GPUs at the official resolution of $832\times640$
-as specified in the official configuration.
-
-\section{%
-    Additional Experimental Results and Discussions
-}\label{app:results}
-
-\subsection{Wan2.1 VBench Results}\label{app:results:wan21-vbench}
-We report additional Wan2.1 results
-using VBench scores,
-including a sweep over the cache history length $\mathcal{H}$
-and the maximum number of consecutive cached steps $\mathcal{S}_{\max}$.
-We report both efficiency metrics
-(latency and speedup)
-and the per-dimension VBench breakdown.
-We report results across all evaluated configurations
-in \Cref{tab:app:wan21-vbench-8dims}.
-\input{tables/wan21_vbench_main}
-
-\subsection{VRAM Footprint and Practicality}\label{app:results:vram}
-Cache-based acceleration methods
-may incur non-trivial memory overhead,
-which directly affects their deployability
-on commodity GPUs
-and for large-scale models.
-TeaCache \cite{liu2024timestep}
-and MagCache \cite{ma2025magcache}
-primarily rely on heuristic gating rules
-to decide whether a denoising step
-should execute a full model forward pass
-or reuse cached information.
-Since both methods
-avoid caching per-layer internal activations,
-their peak VRAM usage
-remains close to the baseline model.
-
-In contrast,
-TaylorSeer \cite{TaylorSeer2025}
-caches intermediate activations
-for each transformer layer and module
-(attention and MLP).
-This design introduces substantial memory overhead;
-our profiling shows that TaylorSeer's VRAM usage
-significantly exceeds the baseline
-on large models like Wan2.1 and HiDream-I1-full,
-limiting its practical deployability
-on commodity GPUs.
-
-By design,
-$D^3$-Cache
-stores only a short sliding window
-of transformer output tensors
-(\Cref{sub:method:dmd-cache}),
-rather than layer-wise attention/MLP activations.
-Consequently,
-its VRAM footprint
-is comparable to the baseline
-and remains stable across different models.
-This memory-efficient design,
-combined with the DMD-based prediction mechanism,
-enables superior quality-speed trade-offs
-compared to existing cache-based methods.
-
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\textwidth]{figures/vram_by_model_method.pdf}
-    \caption{Peak VRAM footprint (GiB) across models and methods.}
-    \label{fig:app:vram-by-model-method}
-    \vspace{-10pt}
-\end{figure}
-
-\textbf{Discussion.}
-\Cref{fig:app:vram-by-model-method}
-demonstrates that TeaCache and MagCache track the baseline footprint closely,
-while $D^3$-Cache incurs only minor overhead,
-consistent with its design choice of caching only transformer output tensors.
-In contrast,
-TaylorSeer introduces substantial activation-cache overhead
-that can dominate the memory budget on large video models,
-restricting practical deployments.
-
-\section{DMD Predictor Pseudocode}\label{app:dmd-pseudocode}
-
-\begin{algorithm}[t]
+\begin{algorithm}[H]
 \caption{DMD Prediction for Diffusion Outputs}
 \label{alg:app:dmd-predict}
 \begin{algorithmic}[1]
@@ -129,3 +29,459 @@ restricting practical deployments.
 \State \Return $\hat{\mathbf{y}}_{k+1}$
 \end{algorithmic}
 \end{algorithm}
+
+
+
+\section{Experimental Details}\label{app:experimental-details}
+
+\subsection{Model Configurations}\label{app:setup:model_configurations}
+\textbf{FLUX.1-dev.}~\cite{flux2024}
+We align the evaluation setup across compared acceleration methods
+under the same sampling and hardware configuration.
+
+\textbf{HiDream-I1-full.}~\cite{hidreami1technicalreport}
+We align the evaluation setup across compared acceleration methods
+under the same sampling and hardware configuration.
+
+\textbf{Wan2.1.}~\cite{wan2025}
+We align the evaluation setup across compared acceleration methods
+under the same sampling and hardware configuration.
+
+% HunyuanVideo results are currently disabled.
+% \textbf{HunyuanVideo.}~\cite{kong2024hunyuanvideo}
+% We align the evaluation setup across compared acceleration methods
+% under the same sampling and hardware configuration.
+% Note that due to TaylorSeer's memory requirements exceeding a single H800 GPU capacity,
+% we evaluate it on four H20 GPUs at the official resolution of $832\times640$
+% as specified in the official configuration.
+
+% \section{%
+%     Additional Experimental Results and Discussions
+% }\label{app:results}
+
+% \subsection{Wan2.1 VBench Results}\label{app:results:wan21-vbench}
+% We report additional Wan2.1 results
+% using VBench scores,
+% including a sweep over the cache history length $\mathcal{H}$
+% and the maximum number of consecutive cached steps $\mathcal{S}_{\max}$.
+% We report both efficiency metrics
+% (latency and speedup)
+% and the per-dimension VBench breakdown.
+% We report results across all evaluated configurations
+% in \Cref{tab:app:wan21-vbench-8dims}.
+% \input{tables/wan21_vbench_main}
+
+
+\section{%
+Ablation Results of Experiment Metrics
+}
+
+\subsection{DMD Runtime Breakdown}\label{app:DMD runtime breakdown}
+
+We further quantify the runtime overhead introduced by the DMD module itself.
+In particular,
+we report the wall-clock time of one complete transformer forward pass
+and the wall-clock time of the SVD inside one DMD prediction step.
+All measurements are conducted on FLUX.1-dev
+using DrawBench200 on a single H800 GPU.
+
+\begin{table}[H]
+\centering
+\begingroup
+\setlength{\tabcolsep}{0.42em}
+\renewcommand{\arraystretch}{1.06}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Baseline Avg. Time (s)}
+    & \textbf{Avg. Time (s)}
+    & \textbf{Avg. Full Forward (ms)}
+    & \textbf{Avg. SVD Time (ms)}
+    & \textbf{DMD Overhead / Forward} \\
+\midrule
+11.533
+    & 6.367
+    & 221.364
+    & 0.817
+    & 0.461\% \\
+\bottomrule
+\end{tabular}
+\endgroup
+\caption{Runtime breakdown of $\mathrm{D}^3$-Cache on FLUX.1-dev.}
+\label{tab:app:dmd-runtime-breakdown}
+\end{table}
+
+\Cref{tab:app:dmd-runtime-breakdown}
+shows that the added DMD computation is extremely small
+relative to a full transformer forward pass.
+The SVD costs only 0.817\,ms on average,
+which corresponds to about 0.461\%
+of the 221.364\,ms needed for one full forward step.
+This confirms that the acceleration gains do not come
+at the expense of a practically meaningful per-step decomposition overhead.
+
+We also examine robustness across random seeds
+under the same DMD configuration
+(\(\mathcal{H}=3\), \(S_{\max}=2\), and \(\gamma=0.20\)).
+The results are summarized in \Cref{tab:app:dmd-runtime-seeds}.
+
+\begin{table}[H]
+\centering
+\begingroup
+\setlength{\tabcolsep}{0.34em}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{cccccccccc}
+\toprule
+\textbf{Seed}
+    & \textbf{Baseline (s)}
+    & \textbf{Avg. Time (s)}
+    & \textbf{Forward (ms)}
+    & \textbf{SVD (ms)}
+    & \textbf{Overhead}
+    & \textbf{SSIM}
+    & \textbf{PSNR}
+    & \textbf{LPIPS}
+    & \textbf{FID} \\
+\midrule
+42
+    & 11.533
+    & 6.367
+    & 221.364
+    & 0.817
+    & 0.461\%
+    & 0.897
+    & 25.75
+    & 0.080
+    & 29.68 \\
+1234
+    & 11.533
+    & 6.341
+    & 221.583
+    & 0.819
+    & 0.462\%
+    & 0.877
+    & 24.97
+    & 0.089
+    & 30.87 \\
+2345
+    & 11.630
+    & 6.352
+    & 221.179
+    & 0.814
+    & 0.460\%
+    & 0.889
+    & 25.44
+    & 0.083
+    & 30.24 \\
+\bottomrule
+\end{tabular}
+\endgroup
+\caption{Seed robustness of $\mathrm{D}^3$-Cache runtime and quality on FLUX.1-dev.}
+\label{tab:app:dmd-runtime-seeds}
+\end{table}
+
+The seed study indicates that
+both runtime and quality remain stable.
+The average prompt time varies only from 6.341\,s to 6.367\,s,
+while the SVD overhead stays tightly concentrated
+between 0.460\% and 0.462\% of a full transformer forward pass.
+The image-quality metrics also fluctuate only mildly across seeds,
+with no evidence of numerical instability or sporadic failures.
+
+% \subsection{History length \mathcal{H} of DMD}\label{app:History length of DMD}
+
+
+% \subsection{Max skip steps \mathcal{$S_(max)$} of DMD}\label{app:History length of DMD}
+
+\subsection{History length $\mathcal{H}$ of DMD}\label{app:HistoryLengthDMD}
+
+
+
+\subsection{Max skip steps $S_{\text{max}}$ of DMD}\label{app:MaxSkipStepsDMD}
+
+
+
+\subsection{Rank $r$ of SVD}\label{app:Rank of SVD}
+
+The DMD rank \(r\) is naturally upper-bounded by \(m-1\),
+where \(m\) denotes the history length.
+In all main experiments,
+we therefore use the simple default choice \(r=m-1\).
+This makes the rank a deterministic consequence
+of the selected history length,
+rather than an additional model-specific hyperparameter
+that must be tuned independently for each setting.
+
+To examine sensitivity,
+we additionally sweep \(r\)
+under two representative FLUX.1-dev settings.
+The first uses history length \(m=4\),
+and the second uses \(m=5\);
+both use the same skip budget and gate threshold
+as in the rebuttal study.
+The results are summarized in \Cref{tab:app:rank-svd}.
+
+\begin{table}[H]
+\centering
+\begingroup
+\setlength{\tabcolsep}{0.38em}
+\renewcommand{\arraystretch}{1.06}
+\newcolumntype{L}{>{\hspace{0.45em}}l<{\hspace{0.45em}}}
+\newcolumntype{M}{>{\hspace{0.45em}}c<{\hspace{0.45em}}}
+\newcolumntype{C}{>{\hspace{0.35em}}c<{\hspace{0.35em}}}
+\begin{tabular}{MCCCCC}
+\toprule
+\textbf{History Length \(m\)}
+    & \textbf{Rank \(r\)}
+    & \textbf{SSIM$\uparrow$}
+    & \textbf{PSNR$\uparrow$}
+    & \textbf{LPIPS$\downarrow$}
+    & \textbf{Speedup$\uparrow$} \\
+\midrule
+4 & 1 & 0.874 & 24.95 & 0.1084 & \textbf{1.91$\times$} \\
+4 & 2 & 0.889 & 25.43 & 0.0877 & 1.75$\times$ \\
+4 & 3 & \textbf{0.897} & \textbf{25.90} & \textbf{0.0795} & 1.75$\times$ \\
+\midrule
+5 & 1 & 0.877 & 25.23 & 0.1071 & \textbf{1.79$\times$} \\
+5 & 2 & 0.885 & 25.25 & 0.0920 & 1.70$\times$ \\
+5 & 3 & 0.887 & 25.20 & 0.0890 & 1.74$\times$ \\
+5 & 4 & \textbf{0.896} & \textbf{25.79} & \textbf{0.0809} & 1.68$\times$ \\
+\bottomrule
+\end{tabular}
+\endgroup
+\caption{Sensitivity of FLUX.1-dev image quality and speedup to the SVD rank \(r\).}
+\label{tab:app:rank-svd}
+\end{table}
+
+The trend in \Cref{tab:app:rank-svd}
+is consistent across the two tested history lengths.
+Smaller ranks can be slightly faster,
+but they also incur a clear loss in image quality.
+For \(m=4\),
+the default choice \(r=3\)
+achieves the best SSIM, PSNR, and LPIPS.
+For \(m=5\),
+the default choice \(r=4\)
+again achieves the best SSIM, PSNR, and LPIPS.
+Meanwhile,
+the speedup varies only moderately across ranks
+(roughly \(1.68\times\) to \(1.91\times\)),
+indicating that the main effect of reducing rank
+is to trade away fidelity for a relatively limited efficiency gain.
+
+These results support our default strategy of using \(r=m-1\).
+It provides the most reliable quality
+without introducing an additional rank-tuning loop
+for every model-resolution pair,
+and is therefore a practical default
+for the main experiments reported in this paper.
+
+\subsection{VRAM Footprint and Practicality}\label{app:results:vram}
+Cache-based acceleration methods
+may incur non-trivial memory overhead,
+which directly affects their deployability
+on commodity GPUs
+and for large-scale models.
+TeaCache \cite{liu2024timestep}
+and MagCache \cite{ma2025magcache}
+primarily rely on heuristic gating rules
+to decide whether a denoising step
+should execute a full model forward pass
+or reuse cached information.
+Since both methods
+avoid caching per-layer internal activations,
+their peak VRAM usage
+remains the same as the baseline model.
+
+In contrast,
+TaylorSeer \cite{TaylorSeer2025}
+caches intermediate activations
+for each transformer layer and module
+(attention and MLP).
+This design introduces substantial memory overhead;
+our profiling shows that TaylorSeer's VRAM usage
+significantly exceeds the baseline
+on large models like Wan2.1 and HiDream-I1-full,
+limiting its practical deployability
+on commodity GPUs.
+
+By design,
+$\mathrm{D}^3$-Cache
+stores only a short sliding window
+of transformer output tensors
+(\Cref{sub:method:dmd-cache}),
+rather than layer-wise attention/MLP activations.
+Consequently,
+its VRAM footprint
+is comparable to the baseline
+and remains stable across different models.
+This memory-efficient design,
+combined with the DMD-based prediction mechanism,
+enables superior quality-speed trade-offs
+compared to existing cache-based methods.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/vram_by_model_method.pdf}
+    \caption{Peak VRAM footprint (GiB) across models and methods.}
+    \label{fig:app:vram-by-model-method}
+    \vspace{-10pt}
+\end{figure}
+
+\textbf{Discussion.}
+\Cref{fig:app:vram-by-model-method}
+demonstrates that TeaCache and MagCache track the baseline footprint closely,
+while $\mathrm{D}^3$-Cache incurs only minor overhead,
+consistent with its design choice of caching only transformer output tensors.
+In contrast,
+TaylorSeer introduces substantial activation-cache overhead
+that can dominate the memory budget on large video models,
+restricting practical deployments.
+
+
+\section{%
+Denoiser Output VS Activation}
+
+
+\section{%
+DMD VS Other Fitting Methods}
+
+\subsection{Direct Reuse}
+
+\subsection{Linear Fitting}
+
+\subsection{Exponential Moving Average}
+
+
+\section{Visual Quality Comparision}
+
+\subsection{Text-to-Image Generation Results}
+
+To further support the motivation for modeling latent dynamics directly,
+we include an additional comparison
+between first-order Taylor extrapolation in activation space
+and first-order Taylor extrapolation in latent space on FLUX.1-dev.
+The activation-space variant corresponds to TaylorSeer,
+while the latent-space variant corresponds to a direct latent extrapolation baseline.
+All experiments are conducted on DrawBench200 with a single A40 GPU.
+The results are summarized in \Cref{tab:app:flux-taylor-latent}.
+
+\begin{table}[H]
+\centering
+\begingroup
+\setlength{\tabcolsep}{0.32em}
+\renewcommand{\arraystretch}{1.06}
+\newcolumntype{L}{>{\hspace{0.45em}}l<{\hspace{0.45em}}}
+\newcolumntype{C}{>{\hspace{0.35em}}c<{\hspace{0.35em}}}
+\begin{tabular}{LCCCCCC}
+\toprule
+\textbf{Setting}
+    & \textbf{Latency (s)$\downarrow$}
+    & \textbf{Speedup$\uparrow$}
+    & \textbf{PSNR$\uparrow$}
+    & \textbf{SSIM$\uparrow$}
+    & \textbf{LPIPS$\downarrow$}
+    & \textbf{FID$\downarrow$} \\
+\midrule
+TaylorSeer ($N{=}2,O{=}1$)
+    & 23.50
+    & 1.68$\times$
+    & 25.86
+    & 0.906
+    & 0.075
+    & 25.51 \\
+TaylorSeer ($N{=}3,O{=}1$)
+    & 15.42
+    & 2.56$\times$
+    & 22.31
+    & 0.847
+    & 0.128
+    & 41.24 \\
+TaylorSeer ($N{=}5,O{=}1$)
+    & 12.67
+    & 3.12$\times$
+    & 19.09
+    & 0.777
+    & 0.199
+    & 60.75 \\
+TaylorSeer ($N{=}6,O{=}1$)
+    & 10.14
+    & 3.90$\times$
+    & 17.94
+    & 0.737
+    & 0.236
+    & 69.29 \\
+\midrule
+Latent ($N{=}2,O{=}1$)
+    & 19.79
+    & 2.00$\times$
+    & 25.59
+    & 0.902
+    & 0.078
+    & 26.85 \\
+Latent ($N{=}3,O{=}1$)
+    & 13.90
+    & 2.84$\times$
+    & 21.69
+    & 0.838
+    & 0.138
+    & 43.37 \\
+Latent ($N{=}4,O{=}1$)
+    & 10.94
+    & 3.61$\times$
+    & 19.52
+    & 0.791
+    & 0.186
+    & 57.76 \\
+Latent ($N{=}5,O{=}1$)
+    & 9.49
+    & 4.17$\times$
+    & 17.80
+    & 0.754
+    & 0.233
+    & 71.15 \\
+Latent ($N{=}6,O{=}1$)
+    & 7.85
+    & 5.03$\times$
+    & 16.36
+    & 0.711
+    & 0.282
+    & 84.17 \\
+\bottomrule
+\end{tabular}
+\endgroup
+\caption{First-order Taylor extrapolation on FLUX.1-dev in activation space (TaylorSeer) and latent space.}
+\label{tab:app:flux-taylor-latent}
+\end{table}
+
+The main pattern in \Cref{tab:app:flux-taylor-latent}
+is that standard first-order extrapolation already provides substantial acceleration,
+but the latent-space variant becomes more favorable
+once the sampling budget is pushed further.
+At moderate acceleration,
+the two formulations are relatively close:
+for instance,
+TaylorSeer at \(2.56\times\) achieves
+PSNR/SSIM/LPIPS/FID of 22.31/0.847/0.128/41.24,
+while latent extrapolation at \(2.84\times\)
+obtains 21.69/0.838/0.138/43.37.
+The small quality gap in this regime suggests that
+both activation-space and latent-space extrapolation
+capture a meaningful part of the local denoising dynamics.
+
+The difference becomes clearer in the higher-speed regime.
+TaylorSeer reaches up to \(3.90\times\) speedup,
+whereas the latent-space variant extends to \(5.03\times\).
+Although both incur degradation as acceleration increases,
+latent extrapolation maintains a more favorable speed--quality frontier
+in the intermediate high-speed region:
+at \(3.61\times\),
+the latent-space method still preserves
+19.52\,dB PSNR, 0.791 SSIM, and 0.186 LPIPS,
+which is stronger than TaylorSeer at \(3.12\times\)
+(19.09\,dB, 0.777, 0.199)
+despite running faster.
+This observation is consistent with our central claim that
+modeling latent dynamics directly
+provides a more effective target for aggressive caching and extrapolation.
+
+\subsection{Text-to-Video Generation Results}

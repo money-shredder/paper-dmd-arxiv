@@ -1,0 +1,23 @@
+{
+  "inputs": {
+    "FLUX.1-dev": [
+      "/hdd_local/money-shredder-group/lyb/paper-dmd-arxiv/data/flux_latent_similarity.jsonl"
+    ],
+    "Hi-Dream": [
+      "/hdd_local/money-shredder-group/lyb/paper-dmd-arxiv/data/hi-dream-latent_similarity.jsonl"
+    ],
+    "Wan2.1": [
+      "/hdd_local/money-shredder-group/lyb/paper-dmd-arxiv/data/wan_latent_similarity.jsonl"
+    ]
+  },
+  "output_files": {
+    "cosine_plot": "/hdd_local/money-shredder-group/lyb/paper-dmd-arxiv/figures/motivation/cosine_vs_step.png",
+    "rel_l2_plot": "/hdd_local/money-shredder-group/lyb/paper-dmd-arxiv/figures/motivation/rel_l2_vs_step.png",
+    "aggregate_csv": "/hdd_local/money-shredder-group/lyb/paper-dmd-arxiv/figures/motivation/aggregated_latent_curves.csv"
+  },
+  "num_rows": {
+    "FLUX.1-dev": 10050,
+    "Hi-Dream": 10000,
+    "Wan2.1": 2500
+  }
+}

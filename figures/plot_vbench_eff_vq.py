@@ -43,7 +43,7 @@ METHOD_STYLES: dict[str, MethodStyle] = {
     "Teacache": MethodStyle(display="TeaCache", color_key="TeaCache"),
     "Magcache": MethodStyle(display="MagCache", color_key="MagCache"),
     "Taylorseer": MethodStyle(display="TaylorSeer", color_key="TaylorSeer"),
-    "DMD": MethodStyle(display=r"$D^3$-Cache", color_key="D3-Cache"),
+    "DMD": MethodStyle(display=r"$\mathrm{D}^3$-Cache", color_key="D3-Cache"),
 }
 
 
@@ -139,8 +139,8 @@ def _format_method_appendix(method: str, run: str) -> str:
     if method == "DMD":
         h, s = _dmd_hs_from_run(run)
         if h is not None and s is not None:
-            return rf"$D^3$-Cache ($\mathcal{{H}}{{=}}{h}$,$\mathcal{{S}}{{=}}{s}$)"
-        return r"$D^3$-Cache"
+            return rf"$\mathrm{{D}}^3$-Cache ($\mathcal{{H}}{{=}}{h}$,$\mathcal{{S}}{{=}}{s}$)"
+        return r"$\mathrm{D}^3$-Cache"
     if method == "Teacache":
         m = re.fullmatch(r"r([0-9.]+)", suffix)
         if m:

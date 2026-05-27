@@ -30,16 +30,20 @@
 \subsection{Experimental Setup}\label{sec:results:setup}
 
 \textbf{Model Configurations and Compared Methods.}
-We evaluate $D^3$-Cache
+We evaluate $\mathrm{D}^3$-Cache
 on both text-to-image
 and text-to-video generative models.
 For text-to-image synthesis,
 we employ FLUX.1-dev~\cite{flux2024}
 and HiDream-I1-full~\cite{hidreami1technicalreport}.
 For text-to-video generation,
-we utilize Wan2.1~\cite{wan2025}
-and HunyuanVideo~\cite{kong2024hunyuanvideo}.
-We systematically compare $D^3$-Cache
+we utilize Wan2.1~\cite{wan2025}.
+
+% HunyuanVideo results are currently disabled.
+% For text-to-video generation,
+% we utilize Wan2.1~\cite{wan2025}
+% and HunyuanVideo~\cite{kong2024hunyuanvideo}.
+We systematically compare $\mathrm{D}^3$-Cache
 against state-of-the-art cache-based acceleration methods:
 TeaCache~\cite{liu2024timestep},
 MagCache~\cite{ma2025magcache},
@@ -66,11 +70,12 @@ at $832\times480$ resolution with 65 frames per sample
 and 50 diffusion timesteps.
 All methods are evaluated on a single H800 GPU.
 
-\textbf{HunyuanVideo.}~\cite{kong2024hunyuanvideo}
-All experiments are performed at $832\times624$ resolution
-with embedded CFG scale 6.0 and 129 frames per video.
-Inference employs 50 diffusion timesteps
-and is evaluated on four H20 GPUs with 96 GB memory each.
+% HunyuanVideo results are currently disabled.
+% \textbf{HunyuanVideo.}~\cite{kong2024hunyuanvideo}
+% All experiments are performed at $832\times624$ resolution
+% with embedded CFG scale 6.0 and 129 frames per video.
+% Inference employs 50 diffusion timesteps
+% and is evaluated on four H20 GPUs with 96 GB memory each.
 
 \textbf{Evaluation and Metrics.}
 To comprehensively assess image and video synthesis acceleration methods,
@@ -129,7 +134,7 @@ of the generated images
 reveals a clear hierarchy
 in fidelity preservation
 across different acceleration methods.
-$D^3$-Cache
+$\mathrm{D}^3$-Cache
 demonstrates virtually indistinguishable
 visual quality from Baseline
 across all test samples,
@@ -156,13 +161,13 @@ including erroneous addition of non-existent objects
 such as tree stumps in the scene,
 fundamental alterations to the primary subject matter,
 color attribute shifts in objects,
-and reconfiguration of spatial positional relationships.
+and reconfiguration of spatial positional relanearly identical speedstionships.
 Such semantic-level distortions
 not only result in loss of fine-grained information
 but fundamentally compromise the content integrity
 and visual consistency of the images.
 More critically,
-$D^3$-Cache
+$\mathrm{D}^3$-Cache
 demonstrates superior fidelity
 in fine-grained regions
 compared to other methods,
@@ -178,13 +183,13 @@ reported in \Cref{tab:flux-main}.
 More qualitative results are provided in the supplementary material.
 
 \textbf{Quantitative Results.}
-We evaluate $D^3$-Cache
+We evaluate $\mathrm{D}^3$-Cache
 against representative acceleration baselines
 on two text-to-image models
 (FLUX.1-dev and HiDream-I1-full)
 at \(1024\times1024\)   resolution.
 Overall,
-the results show that $D^3$-Cache
+the results show that $\mathrm{D}^3$-Cache
 achieves a consistently better speed--quality trade-off,
 delivering higher quality
 at comparable   speedups
@@ -192,80 +197,79 @@ and lower latency
 at comparable quality.
 
 On FLUX.1-dev,
-the key trend is that $D^3$-Cache
+the key trend is that $\mathrm{D}^3$-Cache
 delivers better perceptual quality
 at a given latency.
-With configuration \(\mathcal{H}{=}2,\mathcal{S}{=}4\),
-it reaches a \(2.55\times\) speedup
-(11.30\,s \(\rightarrow\) 4.43\,s)
+With configuration \(\mathcal{H}{=}2,S_{\mathrm{max}}{=}2\),
+it reaches a \(2.52\times\) speedup
+(38.24\,s \(\rightarrow\) 15.17\,s)
 and achieves the best quality
 among methods
 with comparable or lower acceleration:
-LPIPS drops to 0.1420,
+LPIPS drops to 0.0930,
 substantially better than TeaCache
-(\(r{=}0.6\), 0.2518)
+(\(r{=}0.5\), 0.2984)
 and MagCache
-(\(\delta{=}0.08\), 0.1826),
+(\(\delta{=}0.12\), 0.1777),
 while also preserving pixel-level structure
-(PSNR/SSIM 23.10\,dB/0.8354).
+(PSNR/SSIM 25.34\,dB/0.8835).
 At a nearly matched acceleration level,
-$D^3$-Cache
+$\mathrm{D}^3$-Cache
 matches TaylorSeer
-(\(\mathcal{N}{=}5,O{=}1\), \(2.50\times\), 4.52\,s)
+(\(\mathcal{N}{=}4,O{=}1\), \(2.39\times\), 15.98\,s)
 but improves both perceptual and structural metrics
-(LPIPS 0.1420 vs. 0.1435;
-SSIM 0.8354 vs. 0.8205;
-PSNR 23.10\,dB vs. 21.98\,dB),
+(LPIPS 0.0930 vs. 0.1068;
+SSIM 0.8835 vs. 0.8667;
+PSNR 25.34\,dB vs. 23.57\,dB),
 indicating that the speedup does not come
 from disproportionately sacrificing fine structure.
 When pushing toward \(3\times\) acceleration,
-$D^3$-Cache
-(\(\mathcal{H}{=}2,\mathcal{S}{=}7\))
+$\mathrm{D}^3$-Cache
+(\(\mathcal{H}{=}2,S_{\mathrm{max}}{=}4\))
 achieves the highest speedup
-at \(3.01\times\) (3.76\,s)
+at \(3.61\times\) (10.59\,s)
 while maintaining LPIPS/SSIM/PSNR
-of 0.1943/0.7957/21.74\,dB,
+of 0.1520/0.8275/22.95\,dB,
 markedly outperforming TaylorSeer
-(\(\mathcal{N}{=}9,O{=}1\), \(2.97\times\), 3.80\,s),
-which degrades to 0.2223/0.7424/18.85\,dB.
+(\(\mathcal{N}{=}6,O{=}1\), \(3.08\times\), 12.42\,s),
+which degrades to 0.1536/0.8184/21.30\,dB.
 \input{figures/video}
 \input{tables/wan21_vbench_main_selected}
+% \input{tables/hunyuan_main}
 
 On HiDream-I1-full,
 the improvements are even more pronounced,
 especially on perceptual metrics.
 At modest acceleration,
-$D^3$-Cache
-with \(\mathcal{H}{=}2,\mathcal{S}{=}1\)
-achieves \(1.8\times\) speedup (12.93\,s)
+$\mathrm{D}^3$-Cache
+with \(\mathcal{H}{=}2,S_{\mathrm{max}}{=}5\)
+achieves \(2.36\times\) speedup (9.72\,s)
 while retaining strong quality
-(LPIPS 0.0863, FID 21.25, PSNR 24.15\,dB, SSIM 0.8637),
+(LPIPS 0.1048, FID 21.53, PSNR 24.20\,dB, SSIM 0.8644),
 clearly surpassing MagCache
-(\(\delta{=}0.15\), \(1.83\times\); LPIPS 0.1695, FID 46.32)
+(\(\delta{=}0.24\), \(1.74\times\); LPIPS 0.4604, FID 102.39)
 and TaylorSeer
-(\(1.86\times\); LPIPS 0.1352, FID 32.50).
+(\(\mathcal{N}{=}3,O{=}1\), \(2.35\times\); LPIPS 0.2177, FID 39.12).
 At higher acceleration,
-$D^3$-Cache
-(\(\mathcal{H}{=}2,\mathcal{S}{=}4\))
+$\mathrm{D}^3$-Cache
+(\(\mathcal{H}{=}2,S_{\mathrm{max}}{=}5\))
 and TaylorSeer
 (\(\mathcal{N}{=}5,O{=}1\))
 run at nearly identical speeds
-(\(3.52\times\), 6.64\,s vs. \(3.51\times\), 6.66\,s),
-but $D^3$-Cache
+(\(3.32\times\), 6.90\,s vs. \(3.23\times\), 7.08\,s),
+but $\mathrm{D}^3$-Cache
 maintains substantially higher visual quality
-(LPIPS 0.1780 vs. 0.3030;
-FID 39.10 vs. 66.03;
-SSIM 0.7527 vs. 0.6386),
+(LPIPS 0.1891 vs. 0.3545;
+FID 38.20 vs. 64.44;
+SSIM 0.7807 vs. 0.6479),
 suggesting better robustness
 as the sampling budget becomes tight.
 Moreover,
 even under aggressive latency constraints,
-$D^3$-Cache
-further increases acceleration to \(4.32\times\) (5.40\,s)
-while keeping CLIPScore close to the baseline
-(0.2884 vs. 0.2889),
-indicating that text--image alignment
-is largely preserved.
+$\mathrm{D}^3$-Cache
+continues to maintain a clear advantage over competing methods
+at nearly identical latency, indicating that text--image alignment
+and perceptual fidelity are better preserved under stronger skipping.
 
 \subsection{Text-to-Video Generation}\label{sec:results:text_to_video_generation}
 
@@ -274,7 +278,7 @@ We evaluate image generation quality
 across caching methods
 against the baseline
 using three representative text descriptions.
-$D^3$-Cache
+$\mathrm{D}^3$-Cache
 achieve 2.5$\times$ speedup
 while maintaining visual fidelity
 comparable to baseline.
@@ -297,15 +301,15 @@ during the denoising process
 severely compromise generation quality.
 
 \subsubsection{Quantitative Results.}
-We evaluate $D^3$-Cache on the Wan2.1 text-to-video model
+We evaluate $\mathrm{D}^3$-Cache on the Wan2.1 text-to-video model
 and compare it against state-of-the-art acceleration methods.
 As shown in \Cref{tab:wan21-vbench-selected},
-$D^3$-Cache achieves competitive or superior performance
+$\mathrm{D}^3$-Cache achieves competitive or superior performance
 across efficiency and quality metrics.
 In particular, at a comparable acceleration level to TeaCache,
-$D^3$-Cache reaches a $2.61\times$ speedup (\(\mathcal{H}{=}2,\mathcal{S}{=}6\)),
+$\mathrm{D}^3$-Cache reaches a $2.61\times$ speedup (\(\mathcal{H}{=}2,S_{\mathrm{max}}{=}6\)),
 slightly surpassing TeaCache's $2.58\times$ while delivering a higher VBench score (80.32 vs. 78.35).
-At moderate compression (\(\mathcal{H}{=}2,\mathcal{S}{=}2\)),
-$D^3$-Cache achieves a $2.02\times$ speedup, comparable to TaylorSeer (1.96$\times$),
+At moderate compression (\(\mathcal{H}{=}2,S_{\mathrm{max}}{=}2\)),
+$\mathrm{D}^3$-Cache achieves a $2.02\times$ speedup, comparable to TaylorSeer (1.96$\times$),
 but with substantially improved fidelity (PSNR/SSIM/LPIPS = 22.35/0.8012/0.1247),
 outperforming TeaCache (19.42/0.6760/0.2338) and MagCache (20.62/0.7463/0.1686).

@@ -1,0 +1,74 @@
+\begin{table}[t]
+\centering\adjustbox{max width=\textwidth}{%
+\begingroup
+\renewcommand{\arraystretch}{1.08}
+\newcolumntype{L}{>{\hspace{0.45em}}l<{\hspace{0.45em}}}
+\newcolumntype{C}{>{\hspace{0.35em}}c<{\hspace{0.35em}}}
+\begin{tabular}{LCC CCCC}
+\toprule
+\multirow{2}{*}{\textbf{Method}}
+    & \multicolumn{2}{c}{\textbf{Efficiency}}
+    & \multicolumn{4}{c}{\textbf{Visual Quality}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-7}
+    & \textbf{Speedup$\uparrow$}
+    & \textbf{Latency (s)$\downarrow$}
+    & \textbf{VBench (\%)$\uparrow$}
+    & \textbf{Background}\\
+    & \textbf{Consistency$\uparrow$}
+    & \textbf{Motion}\\
+    & \textbf{Smoothness$\uparrow$}
+    & \textbf{Imaging}\\
+    & \textbf{Quality$\uparrow$} \\
+\midrule
+Baseline
+    & 1.00$\times$
+    & 148.48
+    & 73.20
+    & 0.9535
+    & 0.9915
+    & 0.7466 \\
+50\% steps
+    & 1.82$\times$
+    & 81.47
+    & ---
+    & ---
+    & ---
+    & --- \\
+TaylorSeer
+    & \multicolumn{2}{c}{OOM}
+    & \multicolumn{4}{c}{OOM} \\
+MagCache ($K{=}5,\delta{=}0.30$)
+    & 2.81$\times$
+    & 52.84
+    & 71.87
+    & 0.9567
+    & 0.9912
+    & 0.7479 \\
+TeaCache ($r{=}0.20$)
+    & 2.46$\times$
+    & 60.37
+    & 74.55
+    & 0.9796
+    & 0.9935
+    & 0.6273 \\
+\rowcolor{gray!35}$\mathrm{D}^3$-Cache ($\mathcal{H}{=}2,\mathcal{S}{=}3,G{=}0.4$)
+    & 2.98$\times$
+    & 49.76
+    & \textbf{78.75}
+    & 0.9413
+    & \textbf{0.9938}
+    & \textbf{0.7483} \\
+\rowcolor{gray!35}$\mathrm{D}^3$-Cache ($\mathcal{H}{=}2,\mathcal{S}{=}5,G{=}0.3$)
+    & \textbf{3.69$\times$}
+    & \textbf{40.23}
+    & \textbf{75.61}
+    & \textbf{0.9801}
+    & 0.9924
+    & 0.7302 \\
+\bottomrule
+\end{tabular}
+\endgroup}
+\caption{Quantitative comparison on HunyuanVideo. TaylorSeer is marked as OOM due to memory overflow under the official evaluation setting.}
+\label{tab:hunyuan-main}
+\vspace{-1.2em}
+\end{table}

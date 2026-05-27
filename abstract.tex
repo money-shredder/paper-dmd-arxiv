@@ -1,45 +1,72 @@
 % !TEX root = paper.tex
 \begin{abstract}
-Diffusion Transformers (DiT)
-have emerged as a leading paradigm
+% Diffusion Transformers (DiT)
+% have emerged as a leading paradigm
+% for high-fidelity image and video generation,
+% demonstrating remarkable generative capabilities.
+% However,
+% their practical deployment
+% remains constrained by the inherent computational burden
+% of iterative denoising,
+% substantially limiting their applicability
+% in real-time scenarios.
+% % While prior work has explored cache-based mechanisms
+% % to amortize computational costs
+% % through selective feature reuse across timesteps,
+% % existing methods
+% % typically rely on static reuse schedules and heuristic thresholds.
+
+% % Because inter-timestep coherence
+% % varies substantially over the denoising trajectory,
+% % fixed policies are brittle:
+% % they either skip essential computations when activations diverge,
+% % incurring noticeable fidelity degradation,
+% % or remain overly conservative,
+% % leaving much of the redundancy unexploited.
+% % This creates a persistent tension
+% % between computational efficiency and generation quality.
+% % To address this challenge
+% % of inference latency and generation fidelity,
+% % we propose $D^3$-Cache,
+% % a training-free diffusion model acceleration method
+% % that leverages low-rank linear dynamic mode decomposition
+% % to forecast transformer output tensors,
+% % thereby enabling omission
+% % of redundant forward computations.
+% % This approach allows us to extrapolate transformer outputs
+% % with minimal quality degradation.
+% % Extensive empirical validation
+% % across diverse image and video generation tasks
+% % demonstrates the efficacy of our method.
+% % $D^3$-Cache achieves $2.49-4.32\times$ inference acceleration
+% % on state-of-the-art models
+% % while preserving generation fidelity and quality.
+Diffusion Transformers (DiTs) have become a leading paradigm
 for high-fidelity image and video generation,
-demonstrating remarkable generative capabilities.
-However,
-their practical deployment
-remains constrained by the inherent computational burden
-of iterative denoising,
-substantially limiting their applicability
-in latency-sensitive and real-time scenarios.
-% While prior work has explored cache-based mechanisms
-% to amortize computational costs
-% through selective feature reuse across timesteps,
-% existing methods
-% typically rely on static reuse schedules and heuristic thresholds.
-Because inter-timestep coherence
-varies substantially over the denoising trajectory,
-fixed policies are brittle:
-they either skip essential computations when activations diverge,
-incurring noticeable fidelity degradation,
-or remain overly conservative,
-leaving much of the redundancy unexploited.
-This creates a persistent tension
-between computational efficiency and generation quality.
-To address this challenge
-of inference latency and generation fidelity,
-we propose $D^3$-Cache,
-a training-free diffusion model acceleration method
-that leverages low-rank linear dynamic mode decomposition
-to forecast transformer output tensors,
-thereby enabling omission
-of redundant forward computations.
-This approach allows us to extrapolate transformer outputs
-with minimal quality degradation.
-Extensive empirical validation
-across diverse image and video generation tasks
-demonstrates the efficacy of our method.
-$D^3$-Cache achieves $2.49-4.32\times$ inference acceleration
-on state-of-the-art models
-while preserving generation fidelity and quality.
-$D^3$-Cache is open-source and available
-at \url{https://anonymous.4open.science/r/dmd-E5A2/}.
+but their iterative denoising process incurs substantial computational cost,
+limiting real-time deployment.
+Training-free feature reuse offers a promising avenue for acceleration
+by caching and reusing intermediate activations across timesteps
+to avoid redundant forward computations.
+However, existing methods often rely on model-specific,
+offline-calibrated control profiles,
+such as fitted rescaling coefficients,
+precomputed step-wise reference ratios,
+or fixed-form extrapolation schemes with prescribed basis functions.
+While effective in many settings,
+these formulations do not explicitly infer the local transition dynamics
+from recent feature trajectories.
+We show that transformer outputs along the denoising trajectory
+exhibit strong temporal coherence,
+characterized by consistently high cosine similarity
+and small relative \(\ell_2\) changes across consecutive steps.
+Motivated by this observation, we propose \textbf{D\textsuperscript{3}-Cache},
+a training-free acceleration method
+that leverages Dynamic Mode Decomposition (DMD)
+to forecast feature trajectories
+and dynamically reuse cached outputs.
+Extensive experiments on image and video generation models demonstrate that
+D\textsuperscript{3}-Cache achieves
+\textbf{2.49--4.32$\times$} inference speedup
+with negligible quality degradation.
 \end{abstract}

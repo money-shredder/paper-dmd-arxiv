@@ -22,7 +22,7 @@ This admits a closed-form solution
     \label{eq:method:prelim:forward-closed}
 \end{equation}
 where $\bar{\alpha}_t = \prod_{s=1}^t (1-\beta_s)$.
-The learned reverse process is characterized by
+The reverse process is characterized by
 \begin{equation}
     p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{c}) = \mathcal{N}\!
     \left(\mathbf{x}_{t-1};
@@ -38,264 +38,219 @@ iteratively denoising toward $\mathbf{x}_0$.
 Dynamic Mode Decomposition (DMD) models the local temporal evolution
 of a sequence of snapshots
 $\{\mathbf{y}_i\}_{i=1}^m \subset \mathbb{R}^D$
-by a linear operator $\mathbf{A} \in \mathbb{R}^{D \times D}$ such that
-\[
-    \mathbf{y}_{i+1} \approx \mathbf{A}\mathbf{y}_i,
-\]
-or equivalently,
-\[
-    \mathbf{Y} \approx \mathbf{A}\mathbf{X}.
-\]
-Here, $m$ denotes the number of snapshots in the local history window,
+by a linear operator $\mathbf{A} \in \mathbb{R}^{D \times D}$
+such that $\mathbf{y}_{i+1} \approx \mathbf{A}\mathbf{y}_i$,
+or equivalently $\mathbf{Y} \approx \mathbf{A}\mathbf{X}$.
+Here, $m$ denotes the number of snapshots in the local history window
 and $D$ denotes the dimension of each snapshot vector.
 In \Cref{sub:method:dmd-cache},
 each $\mathbf{y}_i$ corresponds to a flattened transformer output
 at one denoising step.
 Given snapshots $\{\mathbf{y}_1, \ldots, \mathbf{y}_m\}$,
-the shifted snapshot matrices are defined as
+we form the shifted snapshot matrices
 \begin{equation}
-	\begin{aligned}
-		\mathbf{X} &= [\mathbf{y}_{1}, \ldots, \mathbf{y}_{m-1}]
-		\in \mathbb{R}^{D \times (m-1)}, \\
-		\mathbf{Y} &= [\mathbf{y}_{2}, \ldots, \mathbf{y}_{m}]
-		\in \mathbb{R}^{D \times (m-1)}.
-	\end{aligned}
-	\label{eq:method:xy}
+\begin{aligned}
+    \mathbf{X} &= [\mathbf{y}_{1}, \ldots, \mathbf{y}_{m-1}]
+    \in \mathbb{R}^{D \times (m-1)}, \\
+    \mathbf{Y} &= [\mathbf{y}_{2}, \ldots, \mathbf{y}_{m}]
+    \in \mathbb{R}^{D \times (m-1)},
+\end{aligned}
+\label{eq:method:xy}
 \end{equation}
-A least-squares approximation of $\mathbf{A}$ is given by
-\[
-    \mathbf{A} \approx \mathbf{Y}\mathbf{X}^{\dagger},
-\]
+and obtain the least-squares approximation
+$\mathbf{A} \approx \mathbf{Y}\mathbf{X}^{\dagger}$,
 where $(\cdot)^{\dagger}$ denotes the Moore--Penrose pseudoinverse.
-
-The compact singular value decomposition of $\mathbf{X}$ is
+To compute this efficiently,
+we first take the compact singular value decomposition of $\mathbf{X}$,
 \begin{equation}
-	\mathbf{X} = \mathbf{U}_r \boldsymbol{\Sigma}_r \mathbf{V}_r^{\top},
-	\label{eq:method:svd}
+\mathbf{X} = \mathbf{U}_r \boldsymbol{\Sigma}_r \mathbf{V}_r^{\top},
+\label{eq:method:svd}
 \end{equation}
 where
 $\mathbf{U}_r \in \mathbb{R}^{D \times r}$,
 $\boldsymbol{\Sigma}_r \in \mathbb{R}^{r \times r}$,
 $\mathbf{V}_r \in \mathbb{R}^{(m-1) \times r}$,
 and $r = \min(D, m-1)$.
-The reduced DMD operator
-$\tilde{\mathbf{A}} \in \mathbb{R}^{r \times r}$
-is then defined as
+The reduced operator, its eigendecomposition,
+and the corresponding DMD modes are then
 \begin{equation}
-	\tilde{\mathbf{A}} = \mathbf{U}_r^{\top}\mathbf{Y}\mathbf{V}_r\boldsymbol{\Sigma}_r^{-1}.
-	\label{eq:method:atilde}
+\begin{gathered}
+\tilde{\mathbf{A}} = \mathbf{U}_r^{\top}\mathbf{Y}\mathbf{V}_r\boldsymbol{\Sigma}_r^{-1}, \\
+\tilde{\mathbf{A}}\mathbf{W} = \mathbf{W}\boldsymbol{\Lambda}, \\
+\mathbf{\Phi} = \mathbf{Y}\mathbf{V}_r\boldsymbol{\Sigma}_r^{-1}\mathbf{W}.
+\end{gathered}
+\label{eq:method:dmd-core}
 \end{equation}
-The eigendecomposition of $\tilde{\mathbf{A}}$ is
-\begin{equation}
-	\tilde{\mathbf{A}}\mathbf{W} = \mathbf{W}\boldsymbol{\Lambda},
-	\label{eq:method:eig}
-\end{equation}
-where $\mathbf{W} \in \mathbb{C}^{r \times r}$ contains the eigenvectors
-and $\boldsymbol{\Lambda} \in \mathbb{C}^{r \times r}$ is the diagonal matrix
-of eigenvalues.
-The DMD modes
-$\mathbf{\Phi} \in \mathbb{C}^{D \times r}$
-are given by
-\begin{equation}
-	\mathbf{\Phi} = \mathbf{Y}\mathbf{V}_r\boldsymbol{\Sigma}_r^{-1}\mathbf{W}.
-	\label{eq:method:modes}
-\end{equation}
+where $\mathbf{W} \in \mathbb{C}^{r \times r}$ contains the eigenvectors,
+$\boldsymbol{\Lambda} \in \mathbb{C}^{r \times r}$ is the diagonal matrix
+of eigenvalues, and $\mathbf{\Phi} \in \mathbb{C}^{D \times r}$
+collects the DMD modes.
 The modal coefficients associated with the latest snapshot are
 \begin{equation}
-	\mathbf{b} = \mathbf{\Phi}^{\dagger}\mathbf{y}_m.
-	\label{eq:method:coeff}
+\mathbf{b} = \mathbf{\Phi}^{\dagger}\mathbf{y}_m,
+\label{eq:method:coeff}
 \end{equation}
-The one-step prediction is therefore
+which gives the one-step prediction
 \begin{equation}
-	\hat{\mathbf{y}}_{m+1} = \operatorname{Re}\!\left(\mathbf{\Phi}\boldsymbol{\Lambda}\mathbf{b}\right),
-	\label{eq:method:dmd:predict-discrete}
+\hat{\mathbf{y}}_{m+1}
+= \operatorname{Re}\!\left(\mathbf{\Phi}\boldsymbol{\Lambda}\mathbf{b}\right),
+\label{eq:method:dmd:predict-discrete}
 \end{equation}
 where $\operatorname{Re}(\cdot)$ denotes the real part.
 
-% \subsection{\texorpdfstring{$D^3$-Cache}{D3-Cache}}\label{sub:method:dmd-cache}
-
-\subsection{\textbf{DMD for Diffusion Model.}}\label{sub:method:dmd-cache}
-$D^3$-Cache treats the sequence of diffusion transformer output tensors $\{\mathbf{y}_k\}$
+\subsection{DMD for Diffusion Models}\label{sub:method:dmd-cache}
+$\mathrm{D}^3$-Cache treats the sequence of diffusion transformer output tensors $\{\mathbf{y}_k\}$
 as a temporal signal
-and applies DMD
-to learn the local linear dynamics
+and applies DMD to learn the local linear dynamics
 over short temporal windows.
-This enables a data-driven predictor
-for subsequent transformer outputs,
-allowing us to skip expensive forward passes
+This yields a data-driven predictor
+for subsequent transformer outputs
+and enables selective skipping of expensive forward passes
 when recent preview errors indicate reliable extrapolation.
 
-\textbf{Output Representation.}
 Diffusion inference proceeds as a discrete-time denoising trajectory
 across timesteps $\{t_k\}_{k=1}^K$.
-The timestep interval is defined as
+The interval between two consecutive steps is
 \begin{equation}
 \Delta t_k = |t_k - t_{k-1}|,
 \label{eq:method:dt}
 \end{equation}
 which may vary across different inference schedules.
-
 At step $k$,
-the wrapped diffusion transformer produces a primary output tensor:
+the wrapped diffusion transformer produces a primary output tensor
 \begin{equation}
-\mathbf{y}_k = f_\theta(\mathbf{z}_k, t_k, \mathbf{c}) \in \mathbb{R}^D,
+\mathbf{y}_k = f_\theta(\mathbf{z}_k, t_k, \mathbf{c}),
 \label{eq:method:prelim:diffusion}
 \end{equation}
 where $\mathbf{z}_k$ is the current latent state,
 $\mathbf{c}$ is the conditioning signal (e.g., text embedding),
 $\theta$ are the model parameters,
-and $D$ is the flattened output dimension.
+and each sample in the output tensor is flattened into a vector in $\mathbb{R}^D$
+before DMD fitting.
 In implementation,
-\(\mathbf{y}_k\) is the primary tensor extracted from the module return value:
+$\mathbf{y}_k$ is the primary tensor extracted from the module return value:
 the tensor itself,
 the \texttt{sample} field,
 or the first element of a tuple/list output.
-
-\textbf{Caching Strategy.}
 Unlike layer-wise caching methods that cache intermediate activations
 $\{\mathbf{h}_k^{(\ell)}\}_{\ell=1}^{L}$ from individual blocks,
-$D^3$-Cache operates in the \emph{transformer-output space},
-caching only the primary output tensor $\mathbf{y}_k$ returned by the wrapped module.
-This choice offers several advantages:
-(i) significantly reduced memory footprint compared to storing layer-wise features,
-(ii) direct applicability across architectures with different block structures,
-(iii) natural alignment with the diffusion sampling process.
-
-We maintain a sliding window history buffer
-$\mathcal{H}_k = \{\mathbf{y}_{k-m+1}, \ldots, \mathbf{y}_k\}$
-containing the most recent $m$ outputs.
-This history is updated only upon full forward pass execution.
+$\mathrm{D}^3$-Cache operates in the \emph{transformer-output space},
+caching only the primary output tensor $\mathbf{y}_k$.
+This design reduces the memory footprint relative to storing layer-wise features,
+remains directly applicable across architectures with different block structures,
+and aligns naturally with the diffusion sampling process.
+We therefore maintain a sliding history window
+containing up to the most recent $m$ exact outputs
+\begin{equation}
+\mathcal{H}_k = \{\mathbf{y}_{\tau_1}, \mathbf{y}_{\tau_2}, \ldots, \mathbf{y}_{\tau_n}\},
+\label{eq:method:history}
+\end{equation}
+where $\tau_1 < \tau_2 < \cdots < \tau_n \le k$ index the denoising steps
+at which full forward passes were executed, and $n \le m$.
+Alongside $\mathcal{H}_k$,
+we maintain a companion buffer $\mathcal{D}_k$
+containing up to the most recent $m$ positive timestep intervals,
+and estimate their mean as
+\begin{equation}
+\bar{\Delta t}
+= \frac{1}{|\mathcal{D}_k|} \sum_{\Delta t \in \mathcal{D}_k} \Delta t,
+\label{eq:method:avg-dt}
+\end{equation}
+which is the quantity used in continuous-time extrapolation.
+The history is updated only when a full forward pass is executed.
 Cached predictions are returned to the sampler
-but are \emph{not} added to the history,
-and we cap the number of consecutive cached steps
-to maintain prediction accuracy.
+but are not inserted into $\mathcal{H}_k$,
+and the number of consecutive cached steps is capped
+to limit error accumulation.
 
-
-\textbf{History Window and Timestep Statistics.}
-We maintain a sliding history window
-containing the most recent $m$ transformer outputs:
-\begin{equation}
-	\mathcal{H}_k = \{ \mathbf{y}_{k-m+1}, \mathbf{y}_{k-m+2}, \ldots, \mathbf{y}_k \},
-	\label{eq:method:history}
-\end{equation}
-and compute the mean timestep interval within this window as
-\begin{equation}
-	\bar{\Delta t}
-	=
-	\frac{1}{|\mathcal{D}_k|} \sum_{\Delta t \in \mathcal{D}_k} \Delta t,
-	\label{eq:method:avg-dt}
-\end{equation}
-where $\mathcal{D}_k = \{\Delta t_{k-m+2}, \ldots, \Delta t_k\}$
-collects the timestep intervals within the history window.
-
-\textbf{DMD Applied to Diffusion Outputs.}
-We treat the sequence of transformer outputs $\{\mathbf{y}_k\}$
-as observations of an underlying dynamical system
-indexed by the denoising step $k$.
-Using the window $\mathcal{H}_k$,
+Given the history window $\mathcal{H}_k$,
 we construct the DMD snapshot matrices $(\mathbf{X}, \mathbf{Y})$
-as defined in \Cref{eq:method:xy}
-and obtain the DMD components $(\mathbf{\Phi}, \boldsymbol{\Lambda}, \mathbf{b})$
-via the procedure in \Cref{sub:method:preliminaries}.
-
-\textbf{Continuous-Time Extrapolation.}
-To handle variable timestep spacing in diffusion schedules,
-we convert discrete-time eigenvalues to continuous-time frequencies
-via
+according to \Cref{eq:method:xy}
+and compute the corresponding DMD quantities
+$(\mathbf{\Phi}, \boldsymbol{\Lambda}, \mathbf{b})$
+following the procedure described in \Cref{sub:method:preliminaries}.
+To accommodate non-uniform timestep spacing,
+we transform the discrete-time eigenvalues
+into continuous-time frequencies via
 \begin{equation}
-	\boldsymbol{\omega} = \frac{1}{\bar{\Delta t}}
-	\log\left(\operatorname{diag}(\boldsymbol{\Lambda})\right),
-	\label{eq:method:omega}
+\boldsymbol{\omega}
+= \frac{1}{\bar{\Delta t}}
+\log\left(\operatorname{diag}(\boldsymbol{\Lambda})\right),
+\label{eq:method:omega}
 \end{equation}
-where $\log$ is applied element-wise.
-Thus $\boldsymbol{\omega} \in \mathbb{C}^r$
-in general.
-The predicted output for $t_{k+1}$ is then
+where $\log(\cdot)$ is applied element-wise.
+The transformer output at the subsequent denoising step
+is then predicted as
 \begin{equation}
-	\hat{\mathbf{y}}_{k+1}(\Delta t_{k+1})
-	=
-	\text{Re}\left(
-		\mathbf{\Phi}
-		\left(
-			\exp(\boldsymbol{\omega} \Delta t_{k+1})
-			\odot
-			\mathbf{b}
-		\right)
-	\right),
-	\label{eq:method:predict}
+\hat{\mathbf{y}}_{k+1}(\Delta t_{k+1})
+= \operatorname{Re}\!\left(
+    \mathbf{\Phi}
+    \left(
+        \exp(\boldsymbol{\omega} \Delta t_{k+1})
+        \odot \mathbf{b}
+    \right)
+\right),
+\label{eq:method:predict}
 \end{equation}
-where $\exp(\cdot)$ is applied element-wise
-and $\odot$ denotes the Hadamard product.
-This formulation reduces to the standard discrete-time DMD prediction
-(Eq.\ref{eq:method:dmd:predict-discrete})
-when timestep spacing is uniform.
-
+Under uniform timestep spacing,
+this expression reduces to the standard discrete-time DMD predictor
+in \Cref{eq:method:dmd:predict-discrete}.
 The predicted output is returned to the sampler
-if the adaptive gating criteria
-are satisfied; otherwise,
-a full forward pass is executed to update the history window.
+only when the adaptive gating policy in
+\Cref{sub:method:adaptive_caching} permits reuse;
+otherwise, an exact forward pass is performed,
+the preview error is updated when available,
+and the history window is refreshed with the resulting exact output.
 
 \subsection{Adaptive Caching Policy}\label{sub:method:adaptive_caching}
 
-\textbf{Preview Error.}
-Besides the history buffer,
-the cache stores the most recent preview error
+In addition to the history buffer,
+the cache maintains the most recent preview error
 computed from an exact forward pass.
 Whenever a valid timestep interval is available,
-we can form a \emph{preview} prediction
-\(\tilde{\mathbf{y}}_{k+1}\)
+we first form a \emph{preview} prediction
+$\tilde{\mathbf{y}}_{k+1}$
 from the current history
 without consuming the skip budget.
-After running the exact transformer
-and obtaining \(\mathbf{y}_{k+1}\),
-we update the gate signal using the batch-averaged relative \( \ell_2 \) error
+After the exact transformer output $\mathbf{y}_{k+1}$ is obtained,
+the gate signal is updated using the relative $\ell_2$ error
 \begin{equation}
-	e_{k+1}
-	=
-	\frac{1}{B}
-	\sum_{b=1}^{B}
-	\frac{
-		\left\|
-			\mathrm{vec}\!\left(\tilde{\mathbf{y}}_{k+1}^{(b)}\right)
-			-
-			\mathrm{vec}\!\left(\mathbf{y}_{k+1}^{(b)}\right)
-		\right\|_2
-	}{
-		\left\|
-			\mathrm{vec}\!\left(\mathbf{y}_{k+1}^{(b)}\right)
-		\right\|_2
-	},
-	\label{eq:method:gate-error}
+e_{k+1}
+=
+\frac{
+    \left\|
+        \mathrm{vec}\!\left(\tilde{\mathbf{y}}_{k+1}\right)
+        -
+        \mathrm{vec}\!\left(\mathbf{y}_{k+1}\right)
+    \right\|_2
+}{
+    \left\|
+        \mathrm{vec}\!\left(\mathbf{y}_{k+1}\right)
+    \right\|_2
+},
+\label{eq:method:gate-error}
 \end{equation}
-where \(B\) is the batch size,
-and \(\mathrm{vec}(\cdot)\) flattens each transformer output tensor
-into a vector in \(\mathbb{R}^D\).
-This matches the implementation,
-which compares the preview prediction
-against the actual transformer output directly
-instead of using auxiliary energy-ratio
-or condition-number diagnostics.
+where $\mathrm{vec}(\cdot)$ flattens the transformer output
+into a vector in $\mathbb{R}^D$.
+This design ties the gate signal directly
+to the empirical prediction accuracy
+of the DMD extrapolator.
 
-\textbf{Adaptive Gating Policy.}
-The caching decision is governed by the following hyperparameters:
+The reuse decision is governed by two hyperparameters:
 $S_{\max}$ is the maximum consecutive cached steps,
-which prevents error accumulation and long-range drift; and
-\(\delta_g\) is the gate threshold applied to the most recent preview error.
+which limits error accumulation and long-range drift; and
+$\delta_g$ is the gate threshold applied to the most recent preview error.
 $s_k$ is the current skip counter tracking consecutive cached steps
 since the last full computation.
-
 At step \(k+1\),
-the cache is invoked only when both conditions below are satisfied:
+cache reuse is permitted only when both conditions are satisfied:
 \begin{equation}
-	\label{eq:method:gating}
-	\begin{aligned}
-		e_k &\le \delta_g, \\
-		s_k &< S_{\max}
-	\end{aligned}
+\begin{aligned}
+e_k &\le \delta_g, \\
+s_k &< S_{\max}.
+\end{aligned}
+\label{eq:method:gating}
 \end{equation}
-Otherwise, or whenever the history/timestep state is insufficient,
-a full forward pass
-$\mathbf{y}_{k+1} = f_\theta(\mathbf{z}_{k+1}, t_{k+1}, \mathbf{c})$
-is executed,
-the preview error is refreshed using \Cref{eq:method:gate-error},
-and the history buffer is updated accordingly.
+Otherwise, an exact forward pass is performed,
+the preview error is updated according to \Cref{eq:method:gate-error},
+and the resulting exact output is inserted into the history buffer.
